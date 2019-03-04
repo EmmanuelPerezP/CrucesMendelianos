@@ -1,0 +1,44 @@
+#window{
+    background-color: #303030;
+    font-size:13px;
+}
+/*
+#OR{
+	background-color: #052340;
+	 border-radius: 22px;
+
+}*/
+
+#btn_program{
+    background-color: #3498db;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 10px;
+    border-radius: 22px;
+}
+
+#btn_program:hover
+{
+   	background-color: #69CACA;
+    border-radius: 20px;
+}
+
+#rowHeader {
+    background: #5188db;
+    color: white;
+    border-radius: 0;
+}
+#rowHeader2 {
+    background: #5188db;
+    color: white;
+    border-radius: 0;
+}
+#getObject {
+    background: #088A29;
+    color: black;
+}
+
+#notGetObject{
+    background: #E11B1B;
+    color: black;
+}

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.22.1 -->
+<interface>
+  <requires lib="gtk+" version="3.10"/>
+  <object class="GtkWindow" id="window_main">
+    <property name="name">window</property>
+    <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Operations Research</property>
+    <property name="resizable">False</property>
+    <property name="window_position">center</property>
+    <property name="default_width">400</property>
+    <property name="default_height">300</property>
+    <property name="icon_name">applications-office</property>
+    <property name="gravity">south</property>
+    <signal name="destroy" handler="on_window_main_destroy" swapped="no"/>
+    <child type="titlebar">
+      <placeholder/>
+    </child>
+    <child>
+      <object class="GtkBox">
+        <property name="width_request">500</property>
+        <property name="height_request">300</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="margin_left">20</property>
+        <property name="margin_right">20</property>
+        <property name="margin_top">20</property>
+        <property name="margin_bottom">20</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">15</property>
+        <child>
+          <object class="GtkLabel" id="lbl_title">
+            <property name="name">title</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Dynamic Programming</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="halign">center</property>
+            <property name="orientation">vertical</property>
+            <property name="spacing">5</property>
+            <property name="homogeneous">True</property>
+            <child>
+              <object class="GtkButton" id="btn_program1">
+                <property name="label" translatable="yes">             Floyd            </property>
+                <property name="name">btn_program</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="tooltip_text" translatable="yes">A graph is a set of objects that have some kind of relationship.
+Floyd allows you to find the minimum path in a graph. That is, find the best relationship between two objects. For example: determine the shortest possible travel time between two places.
+In the program you should:
+1. Define the number of objects that are in the relationship.
+2. Define the values ​​of the relationship between objects, if there is no relationship between them, leave the letters INF.</property>
+                <property name="halign">center</property>
+                <signal name="clicked" handler="on_btn_program1_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="btn_program2">
+                <property name="label" translatable="yes">Knapsack</property>
+                <property name="name">btn_program</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="tooltip_text" translatable="yes">The knapsack problem or rucksack problem is a problem in combinatorial optimization: Given a set of items, each with a weight and a value, determine the number of each item to include in a collection so that the total weight is less than or equal to a given limit and the total value is as large as possible.</property>
+                <signal name="clicked" handler="on_btn_program2_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="btn_program3">
+                <property name="label" translatable="yes">Sport Series</property>
+                <property name="name">btn_program</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="tooltip_text" translatable="yes">  This algorithm calculates the probability that a team is a champion depending on the number of missing games. In addition you can calculate with the variants that conyeva play local or visitor.
+  The probability of each team is entered and games are indicated at home.</property>
+                <signal name="clicked" handler="on_btn_program3_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="btn_program4">
+                <property name="label" translatable="yes">TBA</property>
+                <property name="name">btn_program</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="tooltip_text" translatable="yes">Program to be announced</property>
+                <signal name="clicked" handler="on_btn_program4_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="btn_program5">
+                <property name="label" translatable="yes">TBA</property>
+                <property name="name">btn_program</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="tooltip_text" translatable="yes">Program to be announced</property>
+                <signal name="clicked" handler="on_btn_program5_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">4</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="btn_exit">
+                <property name="label" translatable="yes">Exit</property>
+                <property name="name">btn_program</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="tooltip_markup" translatable="yes">Close the application</property>
+                <signal name="clicked" handler="on_btn_exit_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">5</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

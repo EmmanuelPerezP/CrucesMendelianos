@@ -1,0 +1,5 @@
+;A;B;C;D;
+A;0;2;INF;INF;
+B;INF;0;INF;INF;
+C;INF;3;0;5;
+D;INF;INF;INF;0;
