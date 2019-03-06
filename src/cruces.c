@@ -103,7 +103,7 @@ void myCSS(void){
 
 
 
-void createTableP() {
+void createGenotipos() {
     GtkWidget *entry, *radio1, *radio2;
     tableP = calloc(numberNodes,sizeof(GtkWidget**));
     // https://developer.gnome.org/gtk3/stable/GtkGrid.html
@@ -112,8 +112,6 @@ void createTableP() {
     for(int j = 0; j < numberNodes; j++) {
         tableP[j] = calloc(numberNodes,sizeof(GtkWidget*));
     }
-
-
 
     for(int i =0; i < numberNodes; i++) 
     {
@@ -158,8 +156,8 @@ void createTableP() {
 void createTableD0 (int nodes)
 {
 	numberNodes = nodes;
-    printf("%d\n", numberNodes);
-	createTableP();
+	printf("%d\n", numberNodes);
+	createGenotipos();
 	tableD0 = calloc(nodes,sizeof(GtkWidget**));
 	columnD0 = gtk_grid_new ();
 
@@ -468,7 +466,7 @@ void createTablesFromFile(){
 		accion = getNext();
 	}
 
-	createTableP();
+	createGenotipos();
 	setTableFile(matrizAux);
 }
 void createInfoFile(char *filename) {
