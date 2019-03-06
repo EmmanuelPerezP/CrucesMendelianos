@@ -14,6 +14,7 @@
 GtkBuilder    *myBuilder; 
 GtkWidget     *windowInitial;
 GtkWidget     *windowCreateData;
+GtkWidget     *windowGenotipos;
 GtkWidget     *windowFinal;
 GtkWidget     *chooseFileButton;
 GtkWidget     *windowSelectSize;
@@ -30,7 +31,7 @@ GtkWidget 		*columnD0;
 
 GtkWidget     ***tableP;
 GtkWidget 		*columnP;
-GtkWidget 		*scrolledTableP;
+GtkWidget 		*genotypeTable;
 
 GtkWidget     *label_table_DNumber;
 GtkWidget     *label_betterPath;
@@ -107,15 +108,16 @@ void createGenotipos() {
     GtkWidget *entry, *radio1, *radio2;
     tableP = calloc(numberNodes,sizeof(GtkWidget**));
     // https://developer.gnome.org/gtk3/stable/GtkGrid.html
+		printf("%d\n", numberNodes);
     columnP = gtk_grid_new();
-    gtk_container_add(GTK_CONTAINER(scrolledTableP), columnP);
+    gtk_container_add(GTK_CONTAINER(genotypeTable), columnP);
     for(int j = 0; j < numberNodes; j++) {
-        tableP[j] = calloc(numberNodes,sizeof(GtkWidget*));
+        tableP[j] = calloc(numberNodes, sizeof(GtkWidget*));
     }
 
-    for(int i =0; i < numberNodes; i++) 
+    for(int i = 0; i < numberNodes; i++) 
     {
-        for(int j=0; j < numberNodes; j++) 
+        for(int j= 0; j < numberNodes; j++) 
         {
             // Create a radio button with a GtkEntry widget
             radio1 = gtk_radio_button_new_with_label(NULL, "AABBaaB");
@@ -150,6 +152,7 @@ void createGenotipos() {
             // }
         }
     }
+		gtk_widget_show_all(windowGenotipos);
 }
 
 
@@ -157,7 +160,6 @@ void createTableD0 (int nodes)
 {
 	numberNodes = nodes;
 	printf("%d\n", numberNodes);
-	createGenotipos();
 	tableD0 = calloc(nodes,sizeof(GtkWidget**));
 	columnD0 = gtk_grid_new ();
 
@@ -297,7 +299,7 @@ void setTableP(int matrixP[][numberNodes-1]){
 			}
 		}
 	}
-	gtk_widget_show_all(scrolledTableP); 
+	gtk_widget_show_all(genotypeTable); 
 }
 
 void setTableFile(int Matriz[][numberNodes-1]){
@@ -797,6 +799,19 @@ void closeError()
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------
+// Funciones para cruces mendelianos
+
+void openGenotipos()
+{
+	createGenotipos();
+	return;
+}
+
+
+
+//------------------------------------------------------------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------------------------------------------------------------
 /*FUNCION PARA PERMITIR SOLO NUMEROS EN ENTRADAS*/
 
 gboolean on_key_press (GtkWidget *widget, GdkEventKey *evento, gpointer user_data)
@@ -827,6 +842,7 @@ int main(int argc, char *argv[])
     //g_signal_connect (G_OBJECT (window), "key_press_event", G_CALLBACK (on_key_press), NULL);   
     windowInitial = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_floyd_start"));
     windowCreateData = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_floyd"));
+    windowGenotipos = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_genotipos"));
     windowFinal  = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_floyd_results"));
 
     g_signal_connect (G_OBJECT (windowCreateData), "key_press_event", G_CALLBACK (on_key_press), NULL);   
@@ -843,7 +859,7 @@ int main(int argc, char *argv[])
     gtk_spin_button_set_increments (GTK_SPIN_BUTTON(spinButtonNode),1,3);
     label_table_DNumber = GTK_WIDGET(gtk_builder_get_object(myBuilder, "lbl_table"));
     scrolledTable = GTK_WIDGET(gtk_builder_get_object(myBuilder, "scrolled_table"));
-    scrolledTableP = GTK_WIDGET(gtk_builder_get_object(myBuilder, "scrolled_graph"));
+    genotypeTable = GTK_WIDGET(gtk_builder_get_object(myBuilder, "genotype_table"));
     combobox_from = GTK_WIDGET(gtk_builder_get_object(myBuilder, "combobox_from"));
     combobox_to = GTK_WIDGET(gtk_builder_get_object(myBuilder, "combobox_to"));
     container_for_combobox_from = GTK_WIDGET(gtk_builder_get_object(myBuilder,"container_from"));
