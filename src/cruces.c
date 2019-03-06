@@ -32,6 +32,7 @@ GtkWidget 		*columnD0;
 GtkWidget     ***tableP;
 GtkWidget 		*columnP;
 GtkWidget 		*genotypeTable;
+GtkWidget 		*genotypeTable1;
 
 GtkWidget     *label_table_DNumber;
 GtkWidget     *label_betterPath;
@@ -115,44 +116,62 @@ void createGenotipos() {
         tableP[j] = calloc(numberNodes, sizeof(GtkWidget*));
     }
 
-    for(int i = 0; i < numberNodes; i++) 
+
+
+    // -------------------------------------------------------
+    // father genotypes
+
+    for(int j = 0; j < numberNodes; j++) 
     {
-        for(int j= 0; j < numberNodes; j++) 
-        {
+
+        if (j == 0){
+            // Create the first entry
             // Create a radio button with a GtkEntry widget
             radio1 = gtk_radio_button_new_with_label(NULL, "AABBaaB");
-
+            gtk_grid_attach (GTK_GRID(columnP), radio1, 0, 0, 1, 1);
+        }
+        if (j != 0){
             // Create a radio button with a label
             radio2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(radio1),
-                                                         "I’m the second radio button.");
-
-
-            tableP[i][j] = radio1;
-            // gtk_entry_set_width_chars(GTK_ENTRY(tableP[i][j]),8);
-            // gtk_widget_set_sensitive(tableP[i][j],FALSE);
-            gtk_grid_attach (GTK_GRID(columnP), tableP[i][j], j, i, 1, 1);
-            //if(i != 0 && j != 0){
-            //	gtk_entry_set_text (GTK_ENTRY(tableP[i][j]),"0");
-            //}
-            // if (i == 0 && j != 0){
-            //     if (loadFileFlag == 1){
-            //         gtk_entry_set_text (GTK_ENTRY(tableP[i][j]),header[j]);
-            //     }
-            //     else{
-            //         gtk_entry_set_text (GTK_ENTRY(tableP[i][j]),alphabetNodes[j-1]);
-            //     }
-            // }
-            // if (j ==0 && i != 0){
-            //     if (loadFileFlag == 1){
-            //         gtk_entry_set_text (GTK_ENTRY(tableP[i][j]),header[i]);
-            //     }
-            //     else{
-            //         gtk_entry_set_text (GTK_ENTRY(tableP[i][j]),alphabetNodes[i-1]);  
-            //     }
-            // }
+                                                                "BABbbAA");
+            tableP[j][0] = radio2;
+            gtk_grid_attach (GTK_GRID(columnP), tableP[j][0], 0, j, 1, 1);
         }
     }
-		gtk_widget_show_all(windowGenotipos);
+
+    // -------------------------------------------------------
+    // mother genotypes
+
+    GtkWidget *radioM1, *radioM2;
+    GtkWidget     ***tableP2;
+    GtkWidget 		*columnP2;
+    columnP2 = gtk_grid_new();
+    gtk_container_add(GTK_CONTAINER(genotypeTable1), columnP2);
+    for(int j = 0; j < numberNodes; j++) {
+        tableP2[j] = calloc(numberNodes, sizeof(GtkWidget*));
+    }
+
+    for(int j = 0; j < numberNodes; j++) 
+    {
+
+        if (j == 0){
+            // Create the first entry
+            // Create a radio button with a GtkEntry widget
+            radioM1 = gtk_radio_button_new_with_label(NULL, "DDBBaaB");
+            gtk_grid_attach (GTK_GRID(columnP2), radioM1, 0, 0, 1, 1);
+        }
+        if (j != 0){
+            // Create a radio button with a label
+            radioM2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(radioM1),
+                                                                "CCCbbAA");
+            tableP2[j][0] = radioM2;
+            gtk_grid_attach (GTK_GRID(columnP2), tableP2[j][0], 0, j, 1, 1);
+        }
+    }
+
+
+
+    gtk_widget_show_all(windowGenotipos);
 }
 
 
@@ -860,6 +879,7 @@ int main(int argc, char *argv[])
     label_table_DNumber = GTK_WIDGET(gtk_builder_get_object(myBuilder, "lbl_table"));
     scrolledTable = GTK_WIDGET(gtk_builder_get_object(myBuilder, "scrolled_table"));
     genotypeTable = GTK_WIDGET(gtk_builder_get_object(myBuilder, "genotype_table"));
+    genotypeTable1 = GTK_WIDGET(gtk_builder_get_object(myBuilder, "genotype_table1"));
     combobox_from = GTK_WIDGET(gtk_builder_get_object(myBuilder, "combobox_from"));
     combobox_to = GTK_WIDGET(gtk_builder_get_object(myBuilder, "combobox_to"));
     container_for_combobox_from = GTK_WIDGET(gtk_builder_get_object(myBuilder,"container_from"));
