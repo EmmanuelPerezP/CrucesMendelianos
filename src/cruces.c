@@ -210,6 +210,16 @@ void createGenotipos() {
     gtk_widget_show_all(windowGenotipos);
 }
 
+// this is the callback that is called everytime dominant entries changes
+void inputCallback(GtkEntry *entry, gchar *string, gpointer user_data) {
+    // get the label from the widget toggled
+   // gchar *label;
+    //label = gtk_button_get_label(togglebutton);
+    
+    //strcpy(caracteristicas[i-1], gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
+    gtk_entry_set_text(GTK_ENTRY(entry), tolower(string));
+
+}
 
 void createTableD0 (int nodes)
 {
@@ -267,11 +277,14 @@ void createTableD0 (int nodes)
 				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"c");
 				gtk_widget_set_sensitive(tableD0[i][j],FALSE);
 
+
+
 				//gtk_widget_hide(window_ingresar_info); 
 			}
 			if (j ==0 && i!=0){
 				//Caracteristicas dominantes -> table[1...n][2]
 				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"C");
+				g_signal_connect (G_OBJECT (tableD0[i][j+2]), gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])), "insert-at-cursor", G_CALLBACK (inputCallback));
 				
 			}
 			
@@ -280,6 +293,7 @@ void createTableD0 (int nodes)
 
 	gtk_widget_show_all(windowCreateData); 
 }
+
 
 void guardarInfo(){
 
