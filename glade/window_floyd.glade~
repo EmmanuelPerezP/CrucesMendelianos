@@ -4,6 +4,7 @@
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkWindow" id="window_descendencia">
     <property name="can_focus">False</property>
+    <property name="window_position">center</property>
     <child>
       <placeholder/>
     </child>
@@ -37,8 +38,6 @@
           <object class="GtkFrame">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="halign">center</property>
-            <property name="valign">center</property>
             <property name="label_xalign">0</property>
             <property name="shadow_type">none</property>
             <child>
@@ -49,13 +48,11 @@
                 <property name="valign">center</property>
                 <property name="left_padding">12</property>
                 <child>
-                  <object class="GtkScrolledWindow" id="offspring">
-                    <property name="width_request">230</property>
-                    <property name="height_request">300</property>
+                  <object class="GtkScrolledWindow" id="offspring_table">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="halign">center</property>
-                    <property name="valign">center</property>
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
                     <property name="shadow_type">in</property>
                     <child>
                       <placeholder/>
@@ -86,11 +83,8 @@
             <property name="homogeneous">True</property>
             <property name="layout_style">start</property>
             <child>
-              <placeholder/>
-            </child>
-            <child>
               <object class="GtkButton">
-                <property name="label" translatable="yes">button</property>
+                <property name="label" translatable="yes">% Fenotipo identico</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -103,7 +97,7 @@
             </child>
             <child>
               <object class="GtkButton">
-                <property name="label" translatable="yes">button</property>
+                <property name="label" translatable="yes">% Genotipo identico</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -116,7 +110,7 @@
             </child>
           </object>
           <packing>
-            <property name="left_attach">1</property>
+            <property name="left_attach">0</property>
             <property name="top_attach">2</property>
           </packing>
         </child>
@@ -135,7 +129,6 @@
   <object class="GtkWindow" id="window_floyd">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">Cruces Mendelianos</property>
-    <property name="resizable">False</property>
     <property name="window_position">center</property>
     <child>
       <placeholder/>
@@ -369,6 +362,9 @@
     <property name="secondary_text" translatable="yes">File format is not valid</property>
     <signal name="close" handler="closeError" swapped="no"/>
     <signal name="response" handler="closeError" swapped="no"/>
+    <child>
+      <placeholder/>
+    </child>
     <child internal-child="vbox">
       <object class="GtkBox">
         <property name="can_focus">False</property>
@@ -634,6 +630,9 @@
     <property name="secondary_text" translatable="yes">The file has been saved successfully</property>
     <signal name="close" handler="closeSave" swapped="no"/>
     <signal name="response" handler="closeSave" swapped="no"/>
+    <child>
+      <placeholder/>
+    </child>
     <child internal-child="vbox">
       <object class="GtkBox">
         <property name="can_focus">False</property>
@@ -1003,7 +1002,6 @@
   </object>
   <object class="GtkWindow" id="window_genotipos">
     <property name="can_focus">False</property>
-    <property name="resizable">False</property>
     <property name="window_position">center</property>
     <child>
       <placeholder/>
@@ -1146,6 +1144,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <signal name="clicked" handler="openDescendencia" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>

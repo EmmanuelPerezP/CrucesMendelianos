@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #include "utility/utilidades.h"
-#include "utility/aBiologia.c"
+// #include "utility/aBiologia.c"
 
 #define gtk_spin_button_get_value_as_float gtk_spin_button_get_value
 #define MINAUX(a, b) ((a) < (b) ? a : b) // return min a , b
@@ -15,6 +15,7 @@ GtkBuilder    *myBuilder;
 GtkWidget     *windowInitial;
 GtkWidget     *windowCreateData;
 GtkWidget     *windowGenotipos;
+GtkWidget     *windowDescendencia;
 GtkWidget     *windowFinal;
 GtkWidget     *chooseFileButton;
 GtkWidget     *windowSelectSize;
@@ -33,6 +34,7 @@ GtkWidget     ***tableP;
 GtkWidget 		*columnP;
 GtkWidget 		*genotypeTable;
 GtkWidget 		*genotypeTable1;
+GtkWidget 		*offspringTable;
 
 GtkWidget     *label_table_DNumber;
 GtkWidget     *label_betterPath;
@@ -209,6 +211,48 @@ void createGenotipos() {
 
     gtk_widget_show_all(windowGenotipos);
 }
+
+void createDescendencia()
+{
+
+    GtkWidget 		*columnDes;
+    GtkWidget     ***tableDes;
+    int tableSize = 10;
+	// numberNodes = nodes;
+	printf("%d\n", tableSize);
+	tableDes = calloc(tableSize,sizeof(GtkWidget**));
+	columnDes = gtk_grid_new ();
+
+
+	for(int j = 0; j < tableSize; j++) {
+		tableDes[j] = calloc(tableSize,sizeof(GtkWidget*));
+	}
+
+	gtk_container_add(GTK_CONTAINER(offspringTable), columnDes);
+
+	for(int i = 0; i < tableSize; i++)
+	{
+		for(int j = 0; j < tableSize; j++)
+		{	
+			tableDes[i][j] = gtk_entry_new();
+			gtk_entry_set_width_chars(GTK_ENTRY(tableDes[i][j]),8);
+			gtk_grid_attach (GTK_GRID(columnDes),tableDes[i][j], j, i, 1, 1);
+
+			if(i == 0 || j == 0){
+				gtk_entry_set_text (GTK_ENTRY(tableDes[i][j]),"AB");
+			}
+
+			if(i != 0 && j != 0){
+				// Descripción caracteristicas dominantes -> table[1...n][1]
+				gtk_entry_set_text (GTK_ENTRY(tableDes[i][j]),"AABb");
+			}
+		}
+	}
+
+	gtk_widget_show_all(windowDescendencia); 
+}
+
+
 
 
 void createTableD0 (int nodes)
@@ -910,13 +954,16 @@ void closeError()
 
 void openGenotipos()
 {
-
     // padresMain();
-
     // contenidoArchivo temp;
     // temp = leerArchivo("../aTemp.txt");
     // printf("Caracteristica: %s",temp.caracteristicas[0]);
     createGenotipos();
+    return;
+}
+
+void openDescendencia(){
+    createDescendencia();
     return;
 }
 
@@ -961,7 +1008,11 @@ int main(int argc, char *argv[])
     //g_signal_connect (G_OBJECT (window), "key_press_event", G_CALLBACK (on_key_press), NULL);   
     windowInitial = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_floyd_start"));
     windowCreateData = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_floyd"));
+    // ---------------------
+    // windows for biologia
     windowGenotipos = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_genotipos"));
+    windowDescendencia = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_descendencia"));
+    // ---------------------
     windowFinal  = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_floyd_results"));
 
     g_signal_connect (G_OBJECT (windowCreateData), "key_press_event", G_CALLBACK (on_key_press), NULL);   
@@ -978,8 +1029,13 @@ int main(int argc, char *argv[])
     gtk_spin_button_set_increments (GTK_SPIN_BUTTON(spinButtonNode),1,3);
     label_table_DNumber = GTK_WIDGET(gtk_builder_get_object(myBuilder, "lbl_table"));
     scrolledTable = GTK_WIDGET(gtk_builder_get_object(myBuilder, "scrolled_table"));
+    // ----------------------
+    // tables for biologia
     genotypeTable = GTK_WIDGET(gtk_builder_get_object(myBuilder, "genotype_table"));
     genotypeTable1 = GTK_WIDGET(gtk_builder_get_object(myBuilder, "genotype_table1"));
+    // table for descendencia
+    offspringTable = GTK_WIDGET(gtk_builder_get_object(myBuilder, "offspring_table"));
+    // ----------------------
     combobox_from = GTK_WIDGET(gtk_builder_get_object(myBuilder, "combobox_from"));
     combobox_to = GTK_WIDGET(gtk_builder_get_object(myBuilder, "combobox_to"));
     container_for_combobox_from = GTK_WIDGET(gtk_builder_get_object(myBuilder,"container_from"));
