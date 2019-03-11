@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #include "utility/utilidades.h"
-// #include "utility/ana.h"
+#include "utility/aBiologia.c"
 
 #define gtk_spin_button_get_value_as_float gtk_spin_button_get_value
 #define MINAUX(a, b) ((a) < (b) ? a : b) // return min a , b
@@ -154,12 +154,15 @@ void createGenotipos() {
             // Create the first entry
             // Create a radio button with a GtkEntry widget
             radio1 = gtk_radio_button_new_with_label(NULL, "AABBaaB");
+            gtk_widget_set_tooltip_text(radio1, "TOOLTIP");
+
             g_signal_connect (G_OBJECT (radio1), "clicked", G_CALLBACK (fatherCallback), NULL); 
             gtk_grid_attach (GTK_GRID(columnP), radio1, 0, 0, 1, 1);
         }
         if (j != 0){
             // Create a radio button with a label
             radio2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(radio1), "BABbbAA");
+            gtk_widget_set_tooltip_text(radio2, "TOOLTIP");
             g_signal_connect (G_OBJECT (radio2), "clicked", G_CALLBACK (fatherCallback), NULL); 
             tableP[j][0] = radio2;
             gtk_grid_attach (GTK_GRID(columnP), tableP[j][0], 0, j, 1, 1);
@@ -855,6 +858,10 @@ void openGenotipos()
 {
 
     // padresMain();
+
+    // contenidoArchivo temp;
+    // temp = leerArchivo("../aTemp.txt");
+    // printf("Caracteristica: %s",temp.caracteristicas[0]);
     createGenotipos();
     return;
 }
