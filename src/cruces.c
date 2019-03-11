@@ -76,12 +76,14 @@ struct caracteristica {
 	char descripcion[20];	
 	};
 
-struct caracteristica *caracteristicas[20]={NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL}; 
+//struct caracteristica *caracteristicas[20]={NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL}; 
 
 int inputNumberNodes;
 int numberNodes = 0;
 int totalNodes  = 0;
 int totalCycles = 0;
+
+
 
 
 void on_window_main_destroy(){gtk_main_quit();}
@@ -203,6 +205,7 @@ void createTableD0 (int nodes)
 			}
 
 			if(i == 0 && j == 1){
+				// Descripción caracteristicas dominantes -> table[1...n][1]
 				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"descrip.");
 				gtk_widget_set_sensitive(tableD0[i][j],FALSE);
 			}
@@ -213,6 +216,8 @@ void createTableD0 (int nodes)
 			}
 
 			if(i == 0 && j == 3){
+				// Descripción caracteristicas recesivas -> table[1...n][3]
+
 				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"descrip.");
 				gtk_widget_set_sensitive(tableD0[i][j],FALSE);
 			}
@@ -222,28 +227,87 @@ void createTableD0 (int nodes)
 				gtk_widget_set_sensitive(tableD0[i][j],FALSE);
 			}
 			if (j == 2 && i != 0){
-				//Aqui tengo que ir agregando las caracteristicas... 
-				//gtk_widget_show_now(window_ingresar_info);
+				//Caracteristicas recesivas -> table[1...n][2]
 
-				//if(gtk_entry_get_text (GTK_ENTRY(ent_letra)) != NULL)
-
-				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"f");
+				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"c");
+				gtk_widget_set_sensitive(tableD0[i][j],FALSE);
 
 				//gtk_widget_hide(window_ingresar_info); 
 			}
 			if (j ==0 && i!=0){
-				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"F");
-				//gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),alphabetNodes[i-1]);
-				//gtk_widget_set_sensitive(tableD0[i][j],FALSE);
+				//Caracteristicas dominantes -> table[1...n][2]
+				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"C");
+				
 			}
-			if (j !=0 && i!=0 && i!=j){
-				//gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"INF");
-				//gtk_widget_set_sensitive(tableD0[i][j],FALSE);
-			}
+			
 		}
 	}
 
 	gtk_widget_show_all(windowCreateData); 
+}
+
+void guardarInfo(){
+
+	// Para guardar los datos ingresados por el usuario
+	char caracteristicas[numberNodes][20];
+	char feno_dominantes[numberNodes][20];
+	char feno_recesivos[numberNodes][20];
+
+	printf("%d\n", numberNodes);
+
+	for(int i = 0; i < numberNodes; i++)
+	{
+		for(int j = 0; j < 4; j++)
+		{
+			//Caracteristicas dominantes -> table[1...n][2]
+			if (j == 0 && i!=0)
+			{
+				strcpy(caracteristicas[i-1], gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
+				//caracteristicas[i] = gtk_entry_get_text(GTK_ENTRY(tableD0[i][j]));
+			}
+			
+			// Descripción caracteristicas dominantes -> table[1...n][1]
+			if(j == 1 && i != 0)
+			{
+				strcpy(feno_dominantes[i-1], gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
+				//feno_dominantes[i] = gtk_entry_get_text(GTK_ENTRY(tableD0[i][j]));
+			}
+			
+			//Caracteristicas recesivas -> table[1...n][2]
+			if (j == 2 && i != 0)
+			{
+				//gtk_entry_get_text(GTK_ENTRY(tableD0[i][j]));	
+			}
+			
+			// Descripción caracteristicas recesivas -> table[1...n][3]
+			if (j == 3 && i != 0) 
+			{
+				strcpy(feno_recesivos[i-1], gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
+				//feno_recesivos[i] = gtk_entry_get_text(GTK_ENTRY(tableD0[i][j]));
+			
+			}
+
+
+		}
+	}
+
+	//Imprimir datos para verificar 
+   int loop;
+   printf("Caracteristicas: \n");
+   for(loop = 0; loop < numberNodes; loop++)
+      printf("%s\n", caracteristicas[loop]);
+
+   int loop1;
+   printf("Fenotipos Dominantes: \n");
+   for(loop1 = 0; loop1 < numberNodes; loop1++)
+      printf("%s\n", feno_dominantes[loop1]);
+
+   int loop2;
+   printf("Fenotipos Recesivos: \n");
+   for(loop2 = 0; loop2 < numberNodes; loop2++)
+      printf("%s\n", feno_recesivos[loop2]);
+
+
 }
 
 void setTableD(int MatrixD[][numberNodes-1]){
@@ -623,19 +687,7 @@ void createMatrix()
 	int i = 0;
 	gtk_widget_hide(windowSelectSize); 
 	inputNumberNodes = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(spinButtonNode));	
-	// inputNumberNodes++; 
-
-	while (i >= inputNumberNodes)
-	{
-		printf("Ingresó datos... + \n");
-		//gtk_widget_show_now(window_ingresar_info);	
-
-		//caracteristicas[i]->letra = gtk_entry_get_text (GTK_ENTRY(ent_letra));
-
-		//caracteristicas[i]->descripcion = gtk_entry_get_text (GTK_ENTRY(ent_descripcion));
-
-		//gtk_widget_hide(window_ingresar_info);
-	}
+	inputNumberNodes++; 
 	createTableD0(inputNumberNodes);
 	gtk_widget_show_now(windowCreateData);
 }
@@ -841,12 +893,18 @@ gboolean on_key_press (GtkWidget *widget, GdkEventKey *evento, gpointer user_dat
 
     if ((evento->keyval >= GDK_KEY_a) && (evento->keyval <= GDK_KEY_z))
         return FALSE;
-        if (evento->keyval == GDK_KEY_Right)
-            return FALSE;
-        if (evento->keyval == GDK_KEY_Left)
-            return FALSE;
-        if (evento->keyval == GDK_KEY_BackSpace) 
-                return FALSE;
+
+    if (evento->keyval == GDK_KEY_Right)
+        return FALSE;
+    
+    if (evento->keyval == GDK_KEY_Left)
+        return FALSE;
+    
+    if (evento->keyval == GDK_KEY_BackSpace) 
+        return FALSE;
+    
+    if (evento->keyval == GDK_KEY_space) 
+        return FALSE;
     else
             return TRUE; 
 }
