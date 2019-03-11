@@ -1,0 +1,19 @@
+6
+A
+Semilla lisa
+Semilla arrugada
+B
+Tallo alto
+Tallo bajo
+C
+Liga
+Saprissa
+D
+Calvicie
+Sin calvicie
+E
+Ojos cafe
+Ojos claros
+F
+Esto
+Eso

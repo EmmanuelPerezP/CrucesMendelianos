@@ -26,7 +26,8 @@ all: $(OBJS)
 	$(LD) -o $(TARGET) $(OBJS) $(LDFLAGS)
 	$(CC) src/main.c -o $(TARGET) $(WARN) $(GTKLIB) -export-dynamic
 	$(CC) -o pending src/pending.c $(WARN) $(GTKLIB) -export-dynamic
-	$(CC) -o cruces src/cruces.c src/utility/utilidades.c $(WARN) $(GTKLIB) -export-dynamic
+	$(CC) -o cruces src/cruces.c src/utility/ana.c $(WARN) $(GTKLIB) -export-dynamic
+	# $(CC) -o ana src/utility/ana.c $(WARN) $(GTKLIB) -export-dynamic
 	$(CC) -o drawing src/drawing.c -lm $(WARN) $(GTKLIB) -export-dynamic
 
 main.o: src/main.c

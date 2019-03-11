@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #include "utility/utilidades.h"
-
+// #include "utility/ana.h"
 
 #define gtk_spin_button_get_value_as_float gtk_spin_button_get_value
 #define MINAUX(a, b) ((a) < (b) ? a : b) // return min a , b
@@ -72,9 +72,9 @@ const char *alphabetNodes[27]={"A","B","C","D","E","F","G","H","I","J",
 "K","L","M","N","Ñ","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
 
 struct caracteristica {
-	char letra[1];
-	char descripcion[20];	
-	};
+    char letra[1];
+    char descripcion[20];	
+    };
 
 struct caracteristica *caracteristicas[20]={NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL}; 
 
@@ -87,37 +87,63 @@ int totalCycles = 0;
 void on_window_main_destroy(){gtk_main_quit();}
 
 void myCSS(void){
-	GtkCssProvider *provider;
-	GdkDisplay *display;
-	GdkScreen *screen;
+    GtkCssProvider *provider;
+    GdkDisplay *display;
+    GdkScreen *screen;
 
-	provider = gtk_css_provider_new ();
-	display = gdk_display_get_default ();
-	screen = gdk_display_get_default_screen (display);
-	gtk_style_context_add_provider_for_screen (screen, GTK_STYLE_PROVIDER (provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    provider = gtk_css_provider_new ();
+    display = gdk_display_get_default ();
+    screen = gdk_display_get_default_screen (display);
+    gtk_style_context_add_provider_for_screen (screen, GTK_STYLE_PROVIDER (provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-	const gchar *myCssFile = "myStyle.css";
-	GError *error = 0;
+    const gchar *myCssFile = "myStyle.css";
+    GError *error = 0;
 
-	gtk_css_provider_load_from_file(provider, g_file_new_for_path(myCssFile), &error);
-	g_object_unref (provider);
+    gtk_css_provider_load_from_file(provider, g_file_new_for_path(myCssFile), &error);
+    g_object_unref (provider);
+}
+
+// this is the callback that is called everytime the father genotype changes
+void fatherCallback(GtkToggleButton *togglebutton, gpointer user_data) {
+    // get the label from the widget toggled
+    gchar *label;
+    label = gtk_button_get_label(togglebutton);
+    if (gtk_toggle_button_get_active(togglebutton)){
+        printf("father: %s\n", label);
+        // get the father group
+        GSList *group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (togglebutton));
+        // get the index of the radio button toggled
+        // https://people.gnome.org/~desrt/glib-docs/glib-Singly-Linked-Lists.html#g-slist-index
+        g_print ("Index = %i\n", g_slist_index (group, togglebutton));
+    }
+}
+
+// this is the callback that is called everytime the mother genotype changes
+void motherCallback(GtkToggleButton *togglebutton, gpointer user_data) {
+    // get the label from the widget toggled
+    gchar *label;
+    label = gtk_button_get_label(togglebutton);
+    if (gtk_toggle_button_get_active(togglebutton)){
+        printf("mother: %s\n", label);
+        // get the mother group
+        GSList *group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (togglebutton));
+        // get the index of the radio button toggled
+        // https://people.gnome.org/~desrt/glib-docs/glib-Singly-Linked-Lists.html#g-slist-index
+        g_print ("Index = %i\n", g_slist_index (group, togglebutton));
+    }
 }
 
 
-
 void createGenotipos() {
-    GtkWidget *entry, *radio1, *radio2;
+    GtkWidget *radio1, *radio2;
     tableP = calloc(numberNodes,sizeof(GtkWidget**));
     // https://developer.gnome.org/gtk3/stable/GtkGrid.html
-		printf("%d\n", numberNodes);
+    printf("%d\n", numberNodes);
     columnP = gtk_grid_new();
     gtk_container_add(GTK_CONTAINER(genotypeTable), columnP);
     for(int j = 0; j < numberNodes; j++) {
         tableP[j] = calloc(numberNodes, sizeof(GtkWidget*));
     }
-
-
-
     // -------------------------------------------------------
     // father genotypes
 
@@ -128,12 +154,13 @@ void createGenotipos() {
             // Create the first entry
             // Create a radio button with a GtkEntry widget
             radio1 = gtk_radio_button_new_with_label(NULL, "AABBaaB");
+            g_signal_connect (G_OBJECT (radio1), "clicked", G_CALLBACK (fatherCallback), NULL); 
             gtk_grid_attach (GTK_GRID(columnP), radio1, 0, 0, 1, 1);
         }
         if (j != 0){
             // Create a radio button with a label
-            radio2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(radio1),
-                                                                "BABbbAA");
+            radio2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(radio1), "BABbbAA");
+            g_signal_connect (G_OBJECT (radio2), "clicked", G_CALLBACK (fatherCallback), NULL); 
             tableP[j][0] = radio2;
             gtk_grid_attach (GTK_GRID(columnP), tableP[j][0], 0, j, 1, 1);
         }
@@ -142,8 +169,12 @@ void createGenotipos() {
     // -------------------------------------------------------
     // mother genotypes
 
+    // temp pointers for the radios
+    // the first radio that creates the group, the rest of the radios
     GtkWidget *radioM1, *radioM2;
+    // the table containing the radios
     GtkWidget     ***tableP2;
+    // the grid
     GtkWidget 		*columnP2;
     columnP2 = gtk_grid_new();
     gtk_container_add(GTK_CONTAINER(genotypeTable1), columnP2);
@@ -159,17 +190,17 @@ void createGenotipos() {
             // Create a radio button with a GtkEntry widget
             radioM1 = gtk_radio_button_new_with_label(NULL, "DDBBaaB");
             gtk_grid_attach (GTK_GRID(columnP2), radioM1, 0, 0, 1, 1);
+            g_signal_connect (G_OBJECT (radioM1), "clicked", G_CALLBACK (motherCallback), NULL); 
         }
         if (j != 0){
             // Create a radio button with a label
-            radioM2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(radioM1),
-                                                                "CCCbbAA");
+            //radioM2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(radioM1), "CCCbbAA");
+            radioM2 = gtk_radio_button_new_with_label(gtk_radio_button_get_group(radioM1), "CCCbbAA");
+            g_signal_connect (G_OBJECT (radioM2), "clicked", G_CALLBACK (motherCallback), NULL); 
             tableP2[j][0] = radioM2;
             gtk_grid_attach (GTK_GRID(columnP2), tableP2[j][0], 0, j, 1, 1);
         }
     }
-
-
 
     gtk_widget_show_all(windowGenotipos);
 }
@@ -177,331 +208,331 @@ void createGenotipos() {
 
 void createTableD0 (int nodes)
 {
-	numberNodes = nodes;
-	printf("%d\n", numberNodes);
-	tableD0 = calloc(nodes,sizeof(GtkWidget**));
-	columnD0 = gtk_grid_new ();
+    numberNodes = nodes;
+    printf("%d\n", numberNodes);
+    tableD0 = calloc(nodes,sizeof(GtkWidget**));
+    columnD0 = gtk_grid_new ();
 
 
-	for(int j = 0; j < nodes; j++) {
-		tableD0[j] = calloc(nodes,sizeof(GtkWidget*));
-	}
+    for(int j = 0; j < nodes; j++) {
+        tableD0[j] = calloc(nodes,sizeof(GtkWidget*));
+    }
 
-	gtk_container_add(GTK_CONTAINER(scrolledTable), columnD0);
+    gtk_container_add(GTK_CONTAINER(scrolledTable), columnD0);
 
-	for(int i = 0; i < nodes; i++)
-	{
-		for(int j = 0; j < 4; j++)
-		{	
-			tableD0[i][j] = gtk_entry_new();
-			gtk_entry_set_width_chars(GTK_ENTRY(tableD0[i][j]),8);
-			gtk_grid_attach (GTK_GRID(columnD0),tableD0[i][j], j, i, 1, 1);
+    for(int i = 0; i < nodes; i++)
+    {
+        for(int j = 0; j < 4; j++)
+        {	
+            tableD0[i][j] = gtk_entry_new();
+            gtk_entry_set_width_chars(GTK_ENTRY(tableD0[i][j]),8);
+            gtk_grid_attach (GTK_GRID(columnD0),tableD0[i][j], j, i, 1, 1);
 
-			if(i == 0 && j == 0){
-				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"CD");
-				gtk_widget_set_sensitive(tableD0[i][j],FALSE);
-			}
+            if(i == 0 && j == 0){
+                gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"CD");
+                gtk_widget_set_sensitive(tableD0[i][j],FALSE);
+            }
 
-			if(i == 0 && j == 1){
-				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"descrip.");
-				gtk_widget_set_sensitive(tableD0[i][j],FALSE);
-			}
+            if(i == 0 && j == 1){
+                gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"descrip.");
+                gtk_widget_set_sensitive(tableD0[i][j],FALSE);
+            }
 
-			if(i == 0 && j == 2){
-				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"CR");
-				gtk_widget_set_sensitive(tableD0[i][j],FALSE);
-			}
+            if(i == 0 && j == 2){
+                gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"CR");
+                gtk_widget_set_sensitive(tableD0[i][j],FALSE);
+            }
 
-			if(i == 0 && j == 3){
-				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"descrip.");
-				gtk_widget_set_sensitive(tableD0[i][j],FALSE);
-			}
+            if(i == 0 && j == 3){
+                gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"descrip.");
+                gtk_widget_set_sensitive(tableD0[i][j],FALSE);
+            }
 
-			if(i == 0 && j != 0){
-				//gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"0");
-				gtk_widget_set_sensitive(tableD0[i][j],FALSE);
-			}
-			if (j == 2 && i != 0){
-				//Aqui tengo que ir agregando las caracteristicas... 
-				//gtk_widget_show_now(window_ingresar_info);
+            if(i == 0 && j != 0){
+                //gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"0");
+                gtk_widget_set_sensitive(tableD0[i][j],FALSE);
+            }
+            if (j == 2 && i != 0){
+                //Aqui tengo que ir agregando las caracteristicas... 
+                //gtk_widget_show_now(window_ingresar_info);
 
-				//if(gtk_entry_get_text (GTK_ENTRY(ent_letra)) != NULL)
+                //if(gtk_entry_get_text (GTK_ENTRY(ent_letra)) != NULL)
 
-				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"f");
+                gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"f");
 
-				//gtk_widget_hide(window_ingresar_info); 
-			}
-			if (j ==0 && i!=0){
-				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"F");
-				//gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),alphabetNodes[i-1]);
-				//gtk_widget_set_sensitive(tableD0[i][j],FALSE);
-			}
-			if (j !=0 && i!=0 && i!=j){
-				//gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"INF");
-				//gtk_widget_set_sensitive(tableD0[i][j],FALSE);
-			}
-		}
-	}
+                //gtk_widget_hide(window_ingresar_info); 
+            }
+            if (j ==0 && i!=0){
+                gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"F");
+                //gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),alphabetNodes[i-1]);
+                //gtk_widget_set_sensitive(tableD0[i][j],FALSE);
+            }
+            if (j !=0 && i!=0 && i!=j){
+                //gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"INF");
+                //gtk_widget_set_sensitive(tableD0[i][j],FALSE);
+            }
+        }
+    }
 
-	gtk_widget_show_all(windowCreateData); 
+    gtk_widget_show_all(windowCreateData); 
 }
 
 void setTableD(int MatrixD[][numberNodes-1]){
-	int nodes = numberNodes;
-	char labelInstruction[100] = "Características(";
-	char tableNumber[4];
-	sprintf(tableNumber, "%d", totalCycles);
-	strcat(labelInstruction, tableNumber);
-	strcat(labelInstruction, ")");
+    int nodes = numberNodes;
+    char labelInstruction[100] = "Características(";
+    char tableNumber[4];
+    sprintf(tableNumber, "%d", totalCycles);
+    strcat(labelInstruction, tableNumber);
+    strcat(labelInstruction, ")");
 
-	gtk_label_set_text(GTK_LABEL(label_table_DNumber), labelInstruction);
+    gtk_label_set_text(GTK_LABEL(label_table_DNumber), labelInstruction);
 
-	for(int i =0; i < nodes; i++)
-	{ 
-		for(int j=0; j < nodes; j++) 
-		{
-			char str[10];
-			gtk_widget_set_sensitive(tableD0[i][j],FALSE);
+    for(int i =0; i < nodes; i++)
+    { 
+        for(int j=0; j < nodes; j++) 
+        {
+            char str[10];
+            gtk_widget_set_sensitive(tableD0[i][j],FALSE);
 
-			if (i == 0 && j != 0){
-				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]), header[j]);
-			}
-			if (j ==0 && i!=0){
-				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),header[i]);
-			}
+            if (i == 0 && j != 0){
+                gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]), header[j]);
+            }
+            if (j ==0 && i!=0){
+                gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),header[i]);
+            }
 
-			if (j !=0 && i!=0){
-				sprintf(str, "%d", MatrixD[i-1][j-1]);
+            if (j !=0 && i!=0){
+                sprintf(str, "%d", MatrixD[i-1][j-1]);
 
-				 if (strcmp("1000000",str) == 0){
-				 	// Los valores que en la tabla actual son infinitos
-				 	gtk_widget_set_name (tableD0[i][j],"oldValue");
-				 	gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"INF");
+                 if (strcmp("1000000",str) == 0){
+                     // Los valores que en la tabla actual son infinitos
+                     gtk_widget_set_name (tableD0[i][j],"oldValue");
+                     gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"INF");
 
-				 } else if (strcmp(str,gtk_entry_get_text(GTK_ENTRY(tableD0[i][j]))) == 0) {
-					gtk_widget_set_name (tableD0[i][j],"oldValue");
-					gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),str);
-				} else {
-					gtk_widget_set_name (tableD0[i][j],"newValue");
-					gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),str);
-				}
-			}
-		}
-	}
+                 } else if (strcmp(str,gtk_entry_get_text(GTK_ENTRY(tableD0[i][j]))) == 0) {
+                    gtk_widget_set_name (tableD0[i][j],"oldValue");
+                    gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),str);
+                } else {
+                    gtk_widget_set_name (tableD0[i][j],"newValue");
+                    gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),str);
+                }
+            }
+        }
+    }
 
-	gtk_widget_show_all(scrolledTable); 
+    gtk_widget_show_all(scrolledTable); 
 }
 
 void setTableP(int matrixP[][numberNodes-1]){
-	int nodes = numberNodes;
+    int nodes = numberNodes;
 
-	for(int i =0; i < nodes; i++) 
-	{
-		for(int j=0; j < nodes; j++) 
-		{
-			char str[10];
+    for(int i =0; i < nodes; i++) 
+    {
+        for(int j=0; j < nodes; j++) 
+        {
+            char str[10];
 
-			if (i == 0 && j != 0){
-				gtk_entry_set_text (GTK_ENTRY(tableP[i][j]),header[j]);
-			}
-			if (j ==0 && i!=0){
-				gtk_entry_set_text (GTK_ENTRY(tableP[i][j]),header[i]);
-			}
-			if (j !=0 && i!=0){
-				sprintf(str, "%d", matrixP[i-1][j-1]);
-				if (strcmp(str,gtk_entry_get_text(GTK_ENTRY(tableP[i][j])))==0) {
-					gtk_widget_set_name (tableP[i][j],"oldValue");
-				} else {
-					gtk_widget_set_name (tableP[i][j],"newValueP");
-				}
-				gtk_entry_set_text (GTK_ENTRY(tableP[i][j]),str);
-			}
-		}
-	}
-	gtk_widget_show_all(genotypeTable); 
+            if (i == 0 && j != 0){
+                gtk_entry_set_text (GTK_ENTRY(tableP[i][j]),header[j]);
+            }
+            if (j ==0 && i!=0){
+                gtk_entry_set_text (GTK_ENTRY(tableP[i][j]),header[i]);
+            }
+            if (j !=0 && i!=0){
+                sprintf(str, "%d", matrixP[i-1][j-1]);
+                if (strcmp(str,gtk_entry_get_text(GTK_ENTRY(tableP[i][j])))==0) {
+                    gtk_widget_set_name (tableP[i][j],"oldValue");
+                } else {
+                    gtk_widget_set_name (tableP[i][j],"newValueP");
+                }
+                gtk_entry_set_text (GTK_ENTRY(tableP[i][j]),str);
+            }
+        }
+    }
+    gtk_widget_show_all(genotypeTable); 
 }
 
 void setTableFile(int Matriz[][numberNodes-1]){
-	int nodes=numberNodes;
-	tableD0 = calloc(nodes,sizeof(GtkWidget**));
+    int nodes=numberNodes;
+    tableD0 = calloc(nodes,sizeof(GtkWidget**));
 
 
-	columnD0 = gtk_grid_new ();
-	gtk_container_add (GTK_CONTAINER (scrolledTable), columnD0);
+    columnD0 = gtk_grid_new ();
+    gtk_container_add (GTK_CONTAINER (scrolledTable), columnD0);
 
-	for(int j = 0; j < nodes; j++) {
-		tableD0[j] = calloc(nodes,sizeof(GtkWidget*));
-	}
+    for(int j = 0; j < nodes; j++) {
+        tableD0[j] = calloc(nodes,sizeof(GtkWidget*));
+    }
 
-	for(int i =0; i < nodes; i++) 
-	{
-		for(int j=0; j < nodes; j++) 
-		{
-			char str[10];
-			tableD0[i][j] = gtk_entry_new();
-			gtk_entry_set_width_chars(GTK_ENTRY(tableD0[i][j]),8);
-			gtk_grid_attach (GTK_GRID (columnD0),tableD0[i][j] , j, i, 1, 1);
+    for(int i =0; i < nodes; i++) 
+    {
+        for(int j=0; j < nodes; j++) 
+        {
+            char str[10];
+            tableD0[i][j] = gtk_entry_new();
+            gtk_entry_set_width_chars(GTK_ENTRY(tableD0[i][j]),8);
+            gtk_grid_attach (GTK_GRID (columnD0),tableD0[i][j] , j, i, 1, 1);
 
-			if(i == 0 && j == 0){
-				gtk_widget_set_sensitive(tableD0[i][j],FALSE);
-			}
+            if(i == 0 && j == 0){
+                gtk_widget_set_sensitive(tableD0[i][j],FALSE);
+            }
 
-			if(i==j && i != 0 && j != 0){
-				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"0");
-				gtk_widget_set_sensitive(tableD0[i][j],FALSE);
-			}
-			if (i == 0 && j != 0){
-				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),header[j]);
-			}
-			if (j ==0 && i!=0){
-				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),header[i]);
-				gtk_widget_set_sensitive(tableD0[i][j],FALSE);
-			}
+            if(i==j && i != 0 && j != 0){
+                gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"0");
+                gtk_widget_set_sensitive(tableD0[i][j],FALSE);
+            }
+            if (i == 0 && j != 0){
+                gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),header[j]);
+            }
+            if (j ==0 && i!=0){
+                gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),header[i]);
+                gtk_widget_set_sensitive(tableD0[i][j],FALSE);
+            }
 
-			if (j !=0 && i!=0 && i!=j) {
-				if ( Matriz[i-1][j-1] == 1000000){
-					gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"INF");
-				}else{
-					sprintf(str, "%d", Matriz[i-1][j-1]);
-					gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),str);
-				}
+            if (j !=0 && i!=0 && i!=j) {
+                if ( Matriz[i-1][j-1] == 1000000){
+                    gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"INF");
+                }else{
+                    sprintf(str, "%d", Matriz[i-1][j-1]);
+                    gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),str);
+                }
 
-			}
+            }
 
-		}
-	}
+        }
+    }
 
-	gtk_widget_show_all(windowCreateData); 
+    gtk_widget_show_all(windowCreateData); 
 }
 
 void appendChar(int _val) {
-	if (strlen(bufferForFile) == 0) {
-		char dato = (char)_val;
-		char auxiliar[] = {dato,'\0'};
-		strcat(bufferForFile,auxiliar);
-	} else{
-		char dato = (char)_val;
-		char auxiliar[]={dato,'\0'};
-		strcat(bufferForFile,auxiliar);
-	}
+    if (strlen(bufferForFile) == 0) {
+        char dato = (char)_val;
+        char auxiliar[] = {dato,'\0'};
+        strcat(bufferForFile,auxiliar);
+    } else{
+        char dato = (char)_val;
+        char auxiliar[]={dato,'\0'};
+        strcat(bufferForFile,auxiliar);
+    }
 }
 
 void cleanBuffer(){
-	memset(bufferForFile,'\0',strlen(bufferForFile));
+    memset(bufferForFile,'\0',strlen(bufferForFile));
 }
 
 int getNext() {
-	cleanBuffer();
+    cleanBuffer();
 
-	int ch;
+    int ch;
 
-	while (feof(infoFileAux)==0) {   
-		ch = fgetc(infoFileAux);
-		if (ch=='\n') {
-			return 0;
-		}
-		if (ch==';') {
-			return 1;
-		}
-		appendChar(ch);
-	}
-	return 0;
+    while (feof(infoFileAux)==0) {   
+        ch = fgetc(infoFileAux);
+        if (ch=='\n') {
+            return 0;
+        }
+        if (ch==';') {
+            return 1;
+        }
+        appendChar(ch);
+    }
+    return 0;
 }
 
 int loadData(char *filename)
 {
-	infoFile = fopen(filename, "r");
-	int ch;
-	if(infoFile != NULL)
-	{
-		while(feof(infoFile) == 0) {  
-			ch = fgetc(infoFile);
-			if (ch == '\n'){
-				break;
-			}
-			if (ch ==';'){
-				numberNodes ++;
-			}
-		}
+    infoFile = fopen(filename, "r");
+    int ch;
+    if(infoFile != NULL)
+    {
+        while(feof(infoFile) == 0) {  
+            ch = fgetc(infoFile);
+            if (ch == '\n'){
+                break;
+            }
+            if (ch ==';'){
+                numberNodes ++;
+            }
+        }
 
-		fclose(infoFile);
-		return 1;
-	}
-	return 0;
+        fclose(infoFile);
+        return 1;
+    }
+    return 0;
 }
 
 void createTablesFromFile(){
-	int matrizAux[numberNodes-1][numberNodes-1];
-	header = malloc(numberNodes * sizeof(char*));
-	infoFileAux = fopen(filename, "r");
+    int matrizAux[numberNodes-1][numberNodes-1];
+    header = malloc(numberNodes * sizeof(char*));
+    infoFileAux = fopen(filename, "r");
 
-	int i = 0;
-	int j = 0;
-	int flag = 0;
-	int accion = getNext();
-	int var = 0;
+    int i = 0;
+    int j = 0;
+    int flag = 0;
+    int accion = getNext();
+    int var = 0;
 
-	while (var < numberNodes) {
-		
-		if (accion == 0){
-			break;
-		}
-		char * data = malloc(1000);
-		strcpy(data,bufferForFile);
+    while (var < numberNodes) {
+        
+        if (accion == 0){
+            break;
+        }
+        char * data = malloc(1000);
+        strcpy(data,bufferForFile);
 
-		header[var] = data;
+        header[var] = data;
 
-		var ++;
-		accion = getNext();
-	}
+        var ++;
+        accion = getNext();
+    }
 
-	while (i < numberNodes-1) {
-		while (j < numberNodes-1) {
-			accion = getNext();
-			if (flag == 0) {
-				flag = 1;
-				accion = getNext();
-			}
-			if (accion == 1) {
-				if(strcmp("INF",bufferForFile) == 0){
-					// Traduce el infinito como un millon.
-					matrizAux[i][j] = 1000000;
-					j ++;
-				}else{
-					int valor = atoi(bufferForFile);
+    while (i < numberNodes-1) {
+        while (j < numberNodes-1) {
+            accion = getNext();
+            if (flag == 0) {
+                flag = 1;
+                accion = getNext();
+            }
+            if (accion == 1) {
+                if(strcmp("INF",bufferForFile) == 0){
+                    // Traduce el infinito como un millon.
+                    matrizAux[i][j] = 1000000;
+                    j ++;
+                }else{
+                    int valor = atoi(bufferForFile);
 
-					if(valor >= 1000000){
-						matrizAux[i][j] = 1000000;
-						j ++;
-					}else{
-						matrizAux[i][j] = valor;
-						j ++;
-					}
-				}
+                    if(valor >= 1000000){
+                        matrizAux[i][j] = 1000000;
+                        j ++;
+                    }else{
+                        matrizAux[i][j] = valor;
+                        j ++;
+                    }
+                }
 
-			}	
-		}
-		j = 0;
-		i ++;
-		flag = 0;
-		accion = getNext();
-	}
+            }	
+        }
+        j = 0;
+        i ++;
+        flag = 0;
+        accion = getNext();
+    }
 
-	createGenotipos();
-	setTableFile(matrizAux);
+    createGenotipos();
+    setTableFile(matrizAux);
 }
 void createInfoFile(char *filename) {
-	infoFile = fopen(filename,"w+");
-	for(int i =0; i < numberNodes; i++) 
-	{
-	    for(int j=0; j < numberNodes; j++) 
-	    {
-	      
-	      fprintf(infoFile,"%s;",(gtk_entry_get_text(GTK_ENTRY(tableD0[i][j]))));
-	    }
-	     fprintf(infoFile,"\n");
-	}
-	fclose(infoFile);
+    infoFile = fopen(filename,"w+");
+    for(int i =0; i < numberNodes; i++) 
+    {
+        for(int j=0; j < numberNodes; j++) 
+        {
+          
+          fprintf(infoFile,"%s;",(gtk_entry_get_text(GTK_ENTRY(tableD0[i][j]))));
+        }
+         fprintf(infoFile,"\n");
+    }
+    fclose(infoFile);
 }
 
 void saveFile()
@@ -511,12 +542,12 @@ void saveFile()
     int len = gtk_entry_get_text_length (GTK_ENTRY(filenameEntry));
     if(len != 0 )
     {
-    	strcat(filename,gtk_entry_get_text (GTK_ENTRY(filenameEntry)));
-    	strcat(filename,".txt");
-    	
-    	createInfoFile(filename);
-    	gtk_entry_set_text(GTK_ENTRY(filenameEntry),"");
-    	gtk_widget_show_all(windowSave);
+        strcat(filename,gtk_entry_get_text (GTK_ENTRY(filenameEntry)));
+        strcat(filename,".txt");
+        
+        createInfoFile(filename);
+        gtk_entry_set_text(GTK_ENTRY(filenameEntry),"");
+        gtk_widget_show_all(windowSave);
     }
 }
 
@@ -531,48 +562,48 @@ void saveTemp()
 
 void destroy()
 {
-	gtk_widget_hide(windowSave);
+    gtk_widget_hide(windowSave);
 }
 
 void destroyGetPath()
 {
-	gtk_widget_hide(windowFinal);
+    gtk_widget_hide(windowFinal);
 }
 
 int loadFile()
 {
-	filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooseFileButton));
-	int flag = loadData(filename);
-	return flag;
+    filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooseFileButton));
+    int flag = loadData(filename);
+    return flag;
 }
 
 void createMatrixFile()
 {
-	if(loadFile() == 1)
-	{
-		gtk_widget_hide(windowSelectFile);
-		loadFileFlag = 1;
-		createTablesFromFile();
-		gtk_widget_show_all(windowCreateData);
-	} 
+    if(loadFile() == 1)
+    {
+        gtk_widget_hide(windowSelectFile);
+        loadFileFlag = 1;
+        createTablesFromFile();
+        gtk_widget_show_all(windowCreateData);
+    } 
 }
 
 void printMatrix(int matrix[numberNodes-1][numberNodes-1], int totalNode)
 {
-	for (int i = 0; i < totalNode; i++)
-	{
-		for (int j = 0; j < totalNode; j++)
-		{
-			printf("%d\t", matrix[i][j]);
-		}
-		printf("\n");
-	}
-	printf("\n\n\n");
+    for (int i = 0; i < totalNode; i++)
+    {
+        for (int j = 0; j < totalNode; j++)
+        {
+            printf("%d\t", matrix[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n\n\n");
 }
 
 void floydAux(int matrix[numberNodes-1][numberNodes-1], int matrixAux[numberNodes-1][numberNodes-1], int matrixP[numberNodes-1][numberNodes-1], int totalNode, int node)
 {
-	for (int i = 0; i < totalNode; i++)
+    for (int i = 0; i < totalNode; i++)
     { 
         int p;
         for (int j = 0; j < totalNode; j++)
@@ -594,137 +625,137 @@ void floydAux(int matrix[numberNodes-1][numberNodes-1], int matrixAux[numberNode
 
 void createGraph()
 {
-	gtk_widget_hide(windowInitial); 
-	gtk_widget_show_now(windowSelectSize);
+    gtk_widget_hide(windowInitial); 
+    gtk_widget_show_now(windowSelectSize);
 }
 
 void loadGraph()
 {
-	gtk_widget_hide(windowInitial); 
-	gtk_widget_show_now(windowSelectFile);
+    gtk_widget_hide(windowInitial); 
+    gtk_widget_show_now(windowSelectFile);
 }
 
 //Se devuelve a la pantalla inicial
 void goBackFile()
 {
-	gtk_widget_hide(windowSelectFile); 
-	gtk_widget_show_now(windowInitial);
+    gtk_widget_hide(windowSelectFile); 
+    gtk_widget_show_now(windowInitial);
 }
 
 //Se devuelve a la pantalla inicial
 void goBackSize()
 {
-	gtk_widget_hide(windowSelectSize); 
-	gtk_widget_show_now(windowInitial);
+    gtk_widget_hide(windowSelectSize); 
+    gtk_widget_show_now(windowInitial);
 }
 
 void createMatrix()
 {
-	int i = 0;
-	gtk_widget_hide(windowSelectSize); 
-	inputNumberNodes = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(spinButtonNode));	
-	// inputNumberNodes++; 
+    int i = 0;
+    gtk_widget_hide(windowSelectSize); 
+    inputNumberNodes = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(spinButtonNode));	
+    // inputNumberNodes++; 
 
-	while (i >= inputNumberNodes)
-	{
-		printf("Ingresó datos... + \n");
-		//gtk_widget_show_now(window_ingresar_info);	
+    while (i >= inputNumberNodes)
+    {
+        printf("Ingresó datos... + \n");
+        //gtk_widget_show_now(window_ingresar_info);	
 
-		//caracteristicas[i]->letra = gtk_entry_get_text (GTK_ENTRY(ent_letra));
+        //caracteristicas[i]->letra = gtk_entry_get_text (GTK_ENTRY(ent_letra));
 
-		//caracteristicas[i]->descripcion = gtk_entry_get_text (GTK_ENTRY(ent_descripcion));
+        //caracteristicas[i]->descripcion = gtk_entry_get_text (GTK_ENTRY(ent_descripcion));
 
-		//gtk_widget_hide(window_ingresar_info);
-	}
-	createTableD0(inputNumberNodes);
-	gtk_widget_show_now(windowCreateData);
+        //gtk_widget_hide(window_ingresar_info);
+    }
+    createTableD0(inputNumberNodes);
+    gtk_widget_show_now(windowCreateData);
 }
 
 void createHeader() {
-	header = malloc(numberNodes * sizeof(char*));
-	for(int i =0; i < numberNodes; i++) 
-	{
-		for(int j=0; j < numberNodes; j++) 
-		{
-			if (i == 0){
-				header[j] = gtk_entry_get_text(GTK_ENTRY(tableD0[i][j]));
-			}
-		}
-	}
+    header = malloc(numberNodes * sizeof(char*));
+    for(int i =0; i < numberNodes; i++) 
+    {
+        for(int j=0; j < numberNodes; j++) 
+        {
+            if (i == 0){
+                header[j] = gtk_entry_get_text(GTK_ENTRY(tableD0[i][j]));
+            }
+        }
+    }
 }
 
 void applyFloyd() {
-	int MatrizD[numberNodes-1][numberNodes-1];
-	int matrixP[numberNodes-1][numberNodes-1];
-	for(int i =0; i < numberNodes; i++) 
-	{
-		for(int j=0; j < numberNodes; j++) 
-		{
-			if (i != 0 && j != 0)
+    int MatrizD[numberNodes-1][numberNodes-1];
+    int matrixP[numberNodes-1][numberNodes-1];
+    for(int i =0; i < numberNodes; i++) 
+    {
+        for(int j=0; j < numberNodes; j++) 
+        {
+            if (i != 0 && j != 0)
             {
-				if (strcmp(gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])), "INF") == 0)
+                if (strcmp(gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])), "INF") == 0)
                 {
-					// Si en la tabla actual hay un infinitos se traduce a un millon.
-					MatrizD[i-1][j-1] = 1000000;
-					matrixP[i-1][j-1] = atoi(gtk_entry_get_text(GTK_ENTRY(tableP[i][j])));
+                    // Si en la tabla actual hay un infinitos se traduce a un millon.
+                    MatrizD[i-1][j-1] = 1000000;
+                    matrixP[i-1][j-1] = atoi(gtk_entry_get_text(GTK_ENTRY(tableP[i][j])));
 
-				}
-				else
+                }
+                else
                 {
-					// Si en la tabla actual hay un numero más grande que millon se traduce a infinito.
-					int auxiliar = atoi(gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
-					if (auxiliar > 1000000)
+                    // Si en la tabla actual hay un numero más grande que millon se traduce a infinito.
+                    int auxiliar = atoi(gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
+                    if (auxiliar > 1000000)
                     {
-						MatrizD[i-1][j-1] = 1000000;
-						matrixP[i-1][j-1] = atoi(gtk_entry_get_text(GTK_ENTRY(tableP[i][j])));
-					}
+                        MatrizD[i-1][j-1] = 1000000;
+                        matrixP[i-1][j-1] = atoi(gtk_entry_get_text(GTK_ENTRY(tableP[i][j])));
+                    }
                     else
                     {
-						MatrizD[i-1][j-1] = auxiliar;
-						matrixP[i-1][j-1] = atoi(gtk_entry_get_text(GTK_ENTRY(tableP[i][j])));
-					}
-				}
-			}
-		}
-	}
+                        MatrizD[i-1][j-1] = auxiliar;
+                        matrixP[i-1][j-1] = atoi(gtk_entry_get_text(GTK_ENTRY(tableP[i][j])));
+                    }
+                }
+            }
+        }
+    }
 
-	int matrixAux[numberNodes-1][numberNodes-1];;
-	floydAux(MatrizD, matrixAux, matrixP,numberNodes-1, totalCycles);
+    int matrixAux[numberNodes-1][numberNodes-1];;
+    floydAux(MatrizD, matrixAux, matrixP,numberNodes-1, totalCycles);
 
-	//printf("%s\n","matriz post" );
-	//printMatrix(MatrizD, numberNodes-1);
-	setTableD(MatrizD);
-	setTableP(matrixP);
-	totalCycles++;
+    //printf("%s\n","matriz post" );
+    //printMatrix(MatrizD, numberNodes-1);
+    setTableD(MatrizD);
+    setTableP(matrixP);
+    totalCycles++;
 }
 
 void fillCombobox()
 {
-	combobox_from = gtk_combo_box_text_new();
-	combobox_to = gtk_combo_box_text_new();
+    combobox_from = gtk_combo_box_text_new();
+    combobox_to = gtk_combo_box_text_new();
 
-	for (int i = 0; i < numberNodes; ++i)
-	{
-		gtk_combo_box_text_append (GTK_COMBO_BOX_TEXT(combobox_from),NULL,header[i]);
-		gtk_combo_box_text_append (GTK_COMBO_BOX_TEXT(combobox_to),NULL,header[i]);
-	}
-	gtk_container_add(GTK_CONTAINER(container_for_combobox_from), combobox_from);
-	gtk_container_add(GTK_CONTAINER(container_for_combobox_to), combobox_to);
+    for (int i = 0; i < numberNodes; ++i)
+    {
+        gtk_combo_box_text_append (GTK_COMBO_BOX_TEXT(combobox_from),NULL,header[i]);
+        gtk_combo_box_text_append (GTK_COMBO_BOX_TEXT(combobox_to),NULL,header[i]);
+    }
+    gtk_container_add(GTK_CONTAINER(container_for_combobox_from), combobox_from);
+    gtk_container_add(GTK_CONTAINER(container_for_combobox_to), combobox_to);
 }
 
 void execFloyd()
 {
-	gtk_widget_hide(filenameEntry);
-	gtk_widget_hide(filenameLabel);
-	gtk_widget_hide(subtitleLabel);
-	gtk_widget_hide(saveButton);
-	gtk_label_set_text(GTK_LABEL(label_Table_P), " Table P");
+    gtk_widget_hide(filenameEntry);
+    gtk_widget_hide(filenameLabel);
+    gtk_widget_hide(subtitleLabel);
+    gtk_widget_hide(saveButton);
+    gtk_label_set_text(GTK_LABEL(label_Table_P), " Table P");
 
-	if (totalCycles == 0) {
-		totalCycles++;
-		createHeader();
-		applyFloyd();
-	}
+    if (totalCycles == 0) {
+        totalCycles++;
+        createHeader();
+        applyFloyd();
+    }
     else
     {
         if (totalCycles < numberNodes) {
@@ -739,82 +770,82 @@ void execFloyd()
         {
             gtk_widget_show_all(windowFinal);
         }
-	}
+    }
 }
 
 void getOptimalPath(int begin,int end, char label []){
-	char arrow[7] = " --> ";
-	//printf("%s\n", gtk_entry_get_text(GTK_ENTRY(tableP[begin][end])));
-	int medium = atoi(gtk_entry_get_text(GTK_ENTRY(tableP[begin][end])));
-	
+    char arrow[7] = " --> ";
+    //printf("%s\n", gtk_entry_get_text(GTK_ENTRY(tableP[begin][end])));
+    int medium = atoi(gtk_entry_get_text(GTK_ENTRY(tableP[begin][end])));
+    
 
-	if (medium == 0){
-		//printf("Ruta directa de %d a %d \n",begin,end);
-		strcat(label,arrow);
-		strcat(label, header[end]);
-	}
-	else{
-		strcat(label,arrow);
-		strcat(label, header[medium]);
-		//printf("Tome %d y pase por %d \n",begin,medium);
-		getOptimalPath(medium,end, label);
-	}
-	gtk_label_set_text (GTK_LABEL(label_betterPath),label);
+    if (medium == 0){
+        //printf("Ruta directa de %d a %d \n",begin,end);
+        strcat(label,arrow);
+        strcat(label, header[end]);
+    }
+    else{
+        strcat(label,arrow);
+        strcat(label, header[medium]);
+        //printf("Tome %d y pase por %d \n",begin,medium);
+        getOptimalPath(medium,end, label);
+    }
+    gtk_label_set_text (GTK_LABEL(label_betterPath),label);
 }
 
 
 void getOptimalPath_button() {
-	char resultPre [10000] = "";
-	char resultDistance [10000] = "Total distance: ";
-	
-	//trcpy(resultPreOptimal,"");
-	for (int i = 0; i < numberNodes; ++i)
-	{
-		if(strcmp(header[i],gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combobox_from))) == 0) {
-			begin = i;
-		}
-		if(strcmp(header[i],gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combobox_to))) == 0) {
-			end = i;
-		}
-	}
+    char resultPre [10000] = "";
+    char resultDistance [10000] = "Total distance: ";
+    
+    //trcpy(resultPreOptimal,"");
+    for (int i = 0; i < numberNodes; ++i)
+    {
+        if(strcmp(header[i],gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combobox_from))) == 0) {
+            begin = i;
+        }
+        if(strcmp(header[i],gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combobox_to))) == 0) {
+            end = i;
+        }
+    }
 
-	//printf("%d, %d\n",begin, end );
-	if((begin != -1)  && (end != -1)){
-		strcat(resultPre,header[begin]);
-		//resultPreOptimal = header[begin];
+    //printf("%d, %d\n",begin, end );
+    if((begin != -1)  && (end != -1)){
+        strcat(resultPre,header[begin]);
+        //resultPreOptimal = header[begin];
 
-		//print 
-		getOptimalPath(begin,end, resultPre);
-		int peso = atoi(gtk_entry_get_text(GTK_ENTRY(tableD0[begin][end])));
-		char peso_str[80];
-		sprintf(peso_str, "%d", peso);
+        //print 
+        getOptimalPath(begin,end, resultPre);
+        int peso = atoi(gtk_entry_get_text(GTK_ENTRY(tableD0[begin][end])));
+        char peso_str[80];
+        sprintf(peso_str, "%d", peso);
 
-		if(strcmp(gtk_entry_get_text(GTK_ENTRY(tableD0[begin][end])), "INF") != 0){
-			strcat(resultDistance, peso_str);
-			gtk_label_set_text (GTK_LABEL(label_peso), resultDistance);
-		}else{
-			strcat(resultDistance, " there is no route");
-			gtk_label_set_text (GTK_LABEL(label_peso), resultDistance);
-		}
-		
+        if(strcmp(gtk_entry_get_text(GTK_ENTRY(tableD0[begin][end])), "INF") != 0){
+            strcat(resultDistance, peso_str);
+            gtk_label_set_text (GTK_LABEL(label_peso), resultDistance);
+        }else{
+            strcat(resultDistance, " there is no route");
+            gtk_label_set_text (GTK_LABEL(label_peso), resultDistance);
+        }
+        
 
-	}
+    }
 }
 
 void closeSave()
 {
-	gtk_widget_hide(windowSave); 
+    gtk_widget_hide(windowSave); 
 }
 
 void drawGraph()
 {
-	saveTemp();
-	system("./drawing &");
+    saveTemp();
+    system("./drawing &");
 }
 
 void closeError()
 {
-	gtk_widget_hide(windowError); 
+    gtk_widget_hide(windowError); 
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -822,8 +853,10 @@ void closeError()
 
 void openGenotipos()
 {
-	createGenotipos();
-	return;
+
+    // padresMain();
+    createGenotipos();
+    return;
 }
 
 
@@ -895,6 +928,11 @@ int main(int argc, char *argv[])
     drawButton = GTK_WIDGET(gtk_builder_get_object(myBuilder, "btn_dibujar"));
     graph_darea = GTK_WIDGET(gtk_builder_get_object(myBuilder, "graph_area"));
     graph = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_floyd_graph"));
+
+
+    // padres
+    // g_signal_connect (G_OBJECT (window_ingresar_info), "key_press_event", G_CALLBACK (on_key_press), NULL); 
+
 
     gtk_builder_connect_signals(myBuilder, NULL);
     g_object_unref(myBuilder);

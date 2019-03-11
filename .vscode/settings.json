@@ -1,0 +1,8 @@
+{
+  "files.associations": {
+    ".blade.php": "html",
+    ".tpl": "html",
+    "*.html": "html",
+    "ana.h": "c"
+  }
+}
