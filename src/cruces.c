@@ -10,6 +10,7 @@ GtkBuilder    *myBuilder;
 GtkWidget     *windowInitial;
 GtkWidget     *windowCreateData;
 GtkWidget     *windowGenotipos;
+GtkWidget     *windowPercentage;
 GtkWidget     *windowDescendencia;
 GtkWidget     *chooseFileButton;
 GtkWidget     *windowSelectSize;
@@ -576,6 +577,13 @@ contenidoArchivo guardarInfo(int n){
 
 }
 
+void openPercentage()
+{
+    gtk_widget_show_all(windowPercentage);
+}
+
+
+
 void openGenotipos()
 {
     // padresMain();
@@ -669,6 +677,9 @@ int main(int argc, char *argv[])
     // ----------------------
     chooseFileButton = GTK_WIDGET(gtk_builder_get_object(myBuilder, "btn_fileChooser"));
     filenameEntry = GTK_WIDGET(gtk_builder_get_object(myBuilder, "ent_fileName"));
+
+    // Window de porcentajes
+    windowPercentage = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_percentage"));
 
 
     // label para el padre genotipo
