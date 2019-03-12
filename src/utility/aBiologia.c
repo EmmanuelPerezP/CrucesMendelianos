@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <glib.h>
 typedef char string[500];
 string listaAlelos[3];
 string listaPadres[730];
@@ -13,17 +14,13 @@ typedef struct archivo{
  	string feno_recesivos[10];
  } contenidoArchivo;
 
-string *creaCombinacion(string caracteristica){
+char creaCombinacion(string caracteristica){
     //Recibe un string con la letra que representa
     // a la caracteristica y devuelve el string
     // en minuscula, como homocigoto recesivo.
-	int i;
-	string result = ""; 
-	string *resultado = (string *) malloc(48 + 2);
-	for(i = 0; i < strlen(caracteristica); i++){
-		result[i] = tolower(caracteristica[i]);
-	}
-	strcat((*resultado),result);
+    int des = 'A'-'a';
+    char resultado = caracteristica[0] - des;
+
   return resultado;
 }
 
@@ -64,9 +61,9 @@ void creaFenotipos(string listaPadres[],int n, string caracteristicas[], string 
     int i;
     int numero = elevarApotencia(3,n);
     for(i = 0; i < numero; i++){
-        printf("%d ->  %s\n",i,listaPadres[i]);
+        //printf("%d ->  %s\n",i,listaPadres[i]);
         generaFenotipo( listaPadres[i], caracteristicas, n, domimantes, recesivos, i);
-        printf("%d -> %s\n",i,listaFenotipos[i]);
+        //printf("%d -> %s\n",i,listaFenotipos[i]);
     }
 }
 
@@ -85,10 +82,10 @@ void creaAlelos(string caracteristicas){
     strcat(listaAlelos[0],temporal);
     clear_buffer(&temporal);
     strcat(temporal,caracteristicas);
-    strcat(temporal,(*creaCombinacion(caracteristicas)));
+    temporal[1] = creaCombinacion(caracteristicas);
     strcat(listaAlelos[1],temporal);
     clear_buffer(&temporal);
-    strcat(temporal,(*creaCombinacion(caracteristicas)));
+    temporal[0] = creaCombinacion(caracteristicas);
     strcat(temporal,temporal);
     strcat(listaAlelos[2],temporal);
     clear_buffer(&temporal);
@@ -119,6 +116,7 @@ void creaPadres(string listaCaracteristicas[], int n){
     // caracteristicas con el primer elemento, apartir de 
     // esto se realizan las combinaciones con las otras 
     // caracteristicas.
+
     creaAlelos(listaCaracteristicas[0]);
     strcat(listaPadres[0],listaAlelos[0]);
     strcat(listaPadres[1],listaAlelos[1]);
@@ -135,6 +133,9 @@ void creaPadres(string listaCaracteristicas[], int n){
                 strcat(temporal,listaPadres[k]);
                 strcat(temporal,listaAlelos[j]);
                 strcpy(listaPadres2[cantidadPadres],temporal);
+                // printf("Alelo: %s\n", listaAlelos[0]);
+                // printf("Alelo: %s\n", listaAlelos[2]);
+                // printf("Alelo: %s\n", listaAlelos[1]);
                 cantidadPadres ++;
             }
         }
@@ -164,10 +165,8 @@ contenidoArchivo leerArchivo(string nombreArchivo){
     FILE *archivo;
  	char caracter;
  	contenidoArchivo contenido;
- 	string extension = "";
-    strcat(extension,nombreArchivo);
-    strcat(extension,".txt");
- 	archivo = fopen(extension,"rt");
+ 	archivo = fopen(nombreArchivo,"rt");
+
  	string buffer;
  	fgets(buffer,50,archivo);
  	contenido.n = atoi(buffer);
@@ -175,12 +174,13 @@ contenidoArchivo leerArchivo(string nombreArchivo){
     while (feof(archivo) == 0){
         string tempBuffer = "";
         fgets(buffer,50,archivo);
-        strncpy(tempBuffer,buffer,1);
-        strcat(contenido.caracteristicas[i],tempBuffer);
+        strncat(tempBuffer,buffer,1);
+        //printf("%s\n", tempBuffer);
+        strcpy(contenido.caracteristicas[i],tempBuffer);
         fgets(buffer,50,archivo);
-        strcat(contenido.feno_dominantes[i],buffer);
+        strcpy(contenido.feno_dominantes[i],buffer);
         fgets(buffer,50,archivo);
-        strcat(contenido.feno_recesivos[i],buffer);
+        strcpy(contenido.feno_recesivos[i],buffer);
  		//printf("%s",contenido.caracteristicas[i]);
  		i++;
         
