@@ -213,16 +213,7 @@ void createGenotipos() {
 }
 
 
-// this is the callback that is called everytime dominant entries changes
-void inputCallback(GtkEntry *entry, gchar *string, gpointer user_data) {
-    // get the label from the widget toggled
-   // gchar *label;
-    //label = gtk_button_get_label(togglebutton);
-    
-    //strcpy(caracteristicas[i-1], gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
-    gtk_entry_set_text(GTK_ENTRY(entry), tolower(string));
 
-}
 
 void createDescendencia()
 {
@@ -266,7 +257,37 @@ void createDescendencia()
 
 
 
+// this is the callback that is called everytime dominant entries changes
 
+static void enter_callback( GtkWidget *widget, GtkWidget *entry )
+{
+  const gchar *entry_text;
+  entry_text = gtk_entry_get_text (GTK_ENTRY (entry));
+  printf ("Entry contents: %s\n", entry_text);
+	
+}
+
+//solo permitir mayusculas 
+gboolean on_key_press_m(GtkWidget *widget, GdkEventKey *evento, gpointer user_data)
+{
+
+	if ((evento->keyval >= GDK_KEY_A) && (evento->keyval <= GDK_KEY_Z))
+        return FALSE;	
+    if (evento->keyval == GDK_KEY_Right)
+        return FALSE;
+    
+    if (evento->keyval == GDK_KEY_Left)
+        return FALSE;
+    
+    if (evento->keyval == GDK_KEY_BackSpace) 
+        return FALSE;
+    
+    if (evento->keyval == GDK_KEY_space) 
+        return FALSE;
+    
+    else
+            return TRUE; 
+}
 
 void createTableD0 (int nodes)
 {
@@ -291,8 +312,16 @@ void createTableD0 (int nodes)
 			gtk_entry_set_width_chars(GTK_ENTRY(tableD0[i][j]),8);
 			gtk_grid_attach (GTK_GRID(columnD0),tableD0[i][j], j, i, 1, 1);
 
+			if (j ==0 && i!=0){
+				//Caracteristicas dominantes -> table[1...n][2]
+				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"C");
+				g_signal_connect (G_OBJECT (tableD0[i][j]), "key_press_event", G_CALLBACK (on_key_press_m), NULL);
+				//g_signal_connect (GTK_ENTRY(tableD0[i][j]), "activate", G_CALLBACK (enter_callback), GTK_ENTRY(tableD0[i][j]));
+				gtk_entry_set_max_length (GTK_ENTRY(tableD0[i][j]), 1);
+			}
+
 			if(i == 0 && j == 0){
-				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"CD");
+				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"C");
 				gtk_widget_set_sensitive(tableD0[i][j],FALSE);
 			}
 
@@ -303,7 +332,7 @@ void createTableD0 (int nodes)
 			}
 
 			if(i == 0 && j == 2){
-				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"CR");
+				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"C");
 				gtk_widget_set_sensitive(tableD0[i][j],FALSE);
 			}
 
@@ -321,19 +350,14 @@ void createTableD0 (int nodes)
 			if (j == 2 && i != 0){
 				//Caracteristicas recesivas -> table[1...n][2]
 
-				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"c");
+				//gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"c");
 				gtk_widget_set_sensitive(tableD0[i][j],FALSE);
 
 
 
-				//gtk_widget_hide(window_ingresar_info); 
-			}
-			if (j ==0 && i!=0){
-				//Caracteristicas dominantes -> table[1...n][2]
-				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"C");
-				g_signal_connect (G_OBJECT (tableD0[i][j+2]), gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])), "insert-at-cursor", G_CALLBACK (inputCallback));
 				
 			}
+			
 			
 		}
 	}
@@ -372,7 +396,9 @@ void guardarInfo(){
 			//Caracteristicas recesivas -> table[1...n][2]
 			if (j == 2 && i != 0)
 			{
-				//gtk_entry_get_text(GTK_ENTRY(tableD0[i][j]));	
+				
+				//entry_text = gtk_entry_get_text(GTK_ENTRY(tableD0[i][j-2]));
+				
 			}
 			
 			// Descripción caracteristicas recesivas -> table[1...n][3]
@@ -388,10 +414,26 @@ void guardarInfo(){
 	}
 
 	//Imprimir datos para verificar 
+	printf("Imprimiendo información: \n");
+
    int loop;
    printf("Caracteristicas: \n");
    for(loop = 0; loop < numberNodes; loop++)
-      printf("%s\n", caracteristicas[loop]);
+   {
+   		gchar *c;	
+   		int x = 0;
+
+      	printf("%s\n", caracteristicas[loop]);
+
+      	c = gtk_entry_get_text(GTK_ENTRY(tableD0[loop][0]));
+      	x = strlen(c);
+
+      	c = g_utf8_strdown(c,x); 
+      	printf("Minuscula: %s\n", c);
+
+      	gtk_entry_set_text(GTK_ENTRY(tableD0[loop][2]), c);
+
+   }
 
    int loop1;
    printf("Fenotipos Dominantes: \n");
@@ -402,7 +444,6 @@ void guardarInfo(){
    printf("Fenotipos Recesivos: \n");
    for(loop2 = 0; loop2 < numberNodes; loop2++)
       printf("%s\n", feno_recesivos[loop2]);
-
 
 }
 
@@ -989,7 +1030,7 @@ void openDescendencia(){
 //------------------------------------------------------------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------------------------------------------------------------
-/*FUNCION PARA PERMITIR SOLO NUMEROS EN ENTRADAS*/
+/*FUNCION PARA PERMITIR SOLO LETRAS EN ENTRADAS*/
 
 gboolean on_key_press (GtkWidget *widget, GdkEventKey *evento, gpointer user_data)
 //Permite solo numeros en entradas, restringiendo los keypress
@@ -1014,6 +1055,8 @@ gboolean on_key_press (GtkWidget *widget, GdkEventKey *evento, gpointer user_dat
     else
             return TRUE; 
 }
+
+
 
 int main(int argc, char *argv[])
 {
