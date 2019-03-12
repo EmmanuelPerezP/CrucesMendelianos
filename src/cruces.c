@@ -193,6 +193,7 @@ void createGenotipos(int n) {
 void createDescendencia()
 {
 
+    GdkRGBA background;
     GtkWidget 		*columnDes;
     GtkWidget     ***tableDes;
     int tableSize = 10;
@@ -215,6 +216,13 @@ void createDescendencia()
 			tableDes[i][j] = gtk_entry_new();
 			gtk_entry_set_width_chars(GTK_ENTRY(tableDes[i][j]),8);
 			gtk_grid_attach (GTK_GRID(columnDes),tableDes[i][j], j, i, 1, 1);
+
+            // cambiar color de input
+            // https://developer.gnome.org/gtk3/stable/GtkWidget.html#gtk-widget-override-background-color
+            // https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkStateType
+            // https://developer.gnome.org/gdk3/stable/gdk3-RGBA-Colors.html#GdkRGBA
+            gdk_rgba_parse (&background, "#93CCC6");
+            gtk_widget_override_background_color(tableDes[i][j], GTK_STATE_NORMAL, &background);
 
 			if(i == 0 || j == 0){
 				gtk_entry_set_text (GTK_ENTRY(tableDes[i][j]),"AB");
