@@ -614,6 +614,7 @@
     <property name="title" translatable="yes">Shortest Path</property>
     <property name="resizable">False</property>
     <property name="window_position">center</property>
+    <signal name="destroy" handler="on_window_main_destroy" swapped="no"/>
     <child>
       <placeholder/>
     </child>

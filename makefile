@@ -1,5 +1,5 @@
 # change application name here (executable output name)
-TARGET=bin/IOProject
+TARGET=bin/cruces
  
 # compiler
 CC=gcc
@@ -22,13 +22,8 @@ LDFLAGS=$(PTHREAD) $(GTKLIB) -export-dynamic
  
 OBJS=    main.o
  
-all: $(OBJS)
-	$(LD) -o $(TARGET) $(OBJS) $(LDFLAGS)
-	$(CC) src/main.c -o $(TARGET) $(WARN) $(GTKLIB) -export-dynamic
-	$(CC) -o bin/pending src/pending.c $(WARN) $(GTKLIB) -export-dynamic
-	$(CC) -o bin/cruces src/cruces.c $(WARN) $(GTKLIB) -export-dynamic
-	# $(CC) -o ana src/utility/ana.c $(WARN) $(GTKLIB) -export-dynamic
-	$(CC) -o bin/drawing src/drawing.c -lm $(WARN) $(GTKLIB) -export-dynamic
+all:
+	$(CC) src/cruces.c -o $(TARGET) $(WARN) $(CCFLAGS) $(GTKLIB) -export-dynamic
 
 main.o: src/main.c
 	$(CC) -c $(CCFLAGS) src/main.c $(GTKLIB) -o main.o

@@ -35,17 +35,8 @@ char *filename;
 int begin = -1;
 int end = -1;
 
-
-//final
-GtkWidget       *container_for_combobox_to;
 GtkWidget       *filenameEntry;
-GtkWidget	*ent_letra;
-GtkWidget	*ent_descripcion;
-GtkWidget       *filenameLabel;
-GtkWidget       *subtitleLabel;
-GtkWidget       *saveButton;
 GtkWidget       *windowSave;
-
 
 //Guardar Archivo
 FILE *infoFile;
@@ -224,13 +215,13 @@ void createDescendencia()
 
 // this is the callback that is called everytime dominant entries changes
 
-static void enter_callback( GtkWidget *widget, GtkWidget *entry )
-{
-  const gchar *entry_text;
-  entry_text = gtk_entry_get_text (GTK_ENTRY (entry));
-  printf ("Entry contents: %s\n", entry_text);
+// static void enter_callback( GtkWidget *widget, GtkWidget *entry )
+// {
+//   const gchar *entry_text;
+//   entry_text = gtk_entry_get_text (GTK_ENTRY (entry));
+//   printf ("Entry contents: %s\n", entry_text);
 	
-}
+// }
 
 //solo permitir mayusculas 
 gboolean on_key_press_m(GtkWidget *widget, GdkEventKey *evento, gpointer user_data)
@@ -411,6 +402,7 @@ void destroy()
 // ---------------------------
 // Carga archivos de txt
 
+
 int loadData(string nombreArchivo)
 {
     contenidoArchivo archivoContenido;
@@ -426,7 +418,6 @@ void loadFile()
     nombreArchivo = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooseFileButton));
     printf("%s\n", nombreArchivo);
     loadData(nombreArchivo);
-    return 0;
 }
 // ---------------------------
 //Se devuelve a la pantalla inicial
@@ -463,7 +454,6 @@ void goBackFile()
 // se usa para cargar la primera caja de caracteristicas
 void createMatrix()
 {
-	int i = 0;
 	gtk_widget_hide(windowSelectSize); 
 	inputNumberNodes = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(spinButtonNode));	
 	inputNumberNodes++; 
@@ -571,9 +561,9 @@ void openGenotipos()
     int n = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(spinButtonNode)); 
     printf("%d\n",n);
     contenidoArchivo info = guardarInfo(n);
-    printf("Padres: %s|", info.caracteristicas[0]);
-    printf("Padres: %s|", info.caracteristicas[2]);
-    printf("Padres: %s|", info.caracteristicas[1]);
+    // printf("Padres: %s|", info.caracteristicas[0]);
+    // printf("Padres: %s|", info.caracteristicas[2]);
+    // printf("Padres: %s|", info.caracteristicas[1]);
     creaPadres(info.caracteristicas,n);
     creaFenotipos(listaPadres,n,info.caracteristicas,info.feno_dominantes,info.feno_recesivos);
     createGenotipos(n);
@@ -645,7 +635,6 @@ int main(int argc, char *argv[])
 
     gtk_spin_button_set_range (GTK_SPIN_BUTTON(spinButtonNode),1,6);
     gtk_spin_button_set_increments (GTK_SPIN_BUTTON(spinButtonNode),1,3);
-    label_table_DNumber = GTK_WIDGET(gtk_builder_get_object(myBuilder, "lbl_table"));
     scrolledTable = GTK_WIDGET(gtk_builder_get_object(myBuilder, "scrolled_table"));
     // ----------------------
     // tables for biologia
@@ -656,10 +645,6 @@ int main(int argc, char *argv[])
     // ----------------------
     chooseFileButton = GTK_WIDGET(gtk_builder_get_object(myBuilder, "btn_fileChooser"));
     filenameEntry = GTK_WIDGET(gtk_builder_get_object(myBuilder, "ent_fileName"));
-    filenameLabel = GTK_WIDGET(gtk_builder_get_object(myBuilder, "lbl_fileName"));
-    subtitleLabel = GTK_WIDGET(gtk_builder_get_object(myBuilder, "lbl_subtitle3"));
-    label_Table_P = GTK_WIDGET(gtk_builder_get_object(myBuilder, "lbl_graph"));
-    saveButton = GTK_WIDGET(gtk_builder_get_object(myBuilder, "btn_save")); 
 
     gtk_builder_connect_signals(myBuilder, NULL);
     g_object_unref(myBuilder);
