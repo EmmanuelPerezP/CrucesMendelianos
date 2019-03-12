@@ -19,13 +19,19 @@ GtkWidget     *spinButtonNode;
 //CreateData 
 GtkWidget     ***tableD0;
 GtkWidget 		*scrolledTable;
-GtkWidget 		*columnD0;
+GtkGrid 		*columnD0;
 
 GtkWidget     ***tableP;
 GtkWidget 		*columnP;
 GtkWidget 		*genotypeTable;
 GtkWidget 		*genotypeTable1;
 GtkWidget 		*offspringTable;
+
+GtkWidget *labelGenotipoPadre;
+GtkWidget *labelGenotipoMadre;
+GtkWidget *labelFenotipoPadre;
+GtkWidget *labelFenotipoMadre;
+
 
 const char **header;
 char bufferForFile[9];
@@ -49,11 +55,12 @@ struct caracteristica {
 };
 
 
-int inputNumberNodes;
+int inputNumberNodes = 0;
 int numberNodes = 0;
 int totalNodes  = 0;
 int totalCycles = 0;
 
+int cantidadCaracteristicas;
 
 // quit app
 void on_window_main_destroy(){
@@ -73,7 +80,11 @@ void fatherCallback(GtkToggleButton *togglebutton, gpointer user_data) {
         GSList *group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (togglebutton));
         // get the index of the radio button toggled
         // https://people.gnome.org/~desrt/glib-docs/glib-Singly-Linked-Lists.html#g-slist-index
-        g_print ("Index = %i\n", g_slist_index (group, togglebutton));
+        int radioIndex = g_slist_index (group, togglebutton);
+        // index real ya que el index es el opuesto en el array
+        int indexReal = elevarApotencia(3,cantidadCaracteristicas)-1 - radioIndex;
+        gtk_label_set_text (labelGenotipoPadre, listaPadres[indexReal]);
+        gtk_label_set_text (labelFenotipoPadre, listaFenotipos[indexReal]);
     }
 }
 
@@ -88,7 +99,11 @@ void motherCallback(GtkToggleButton *togglebutton, gpointer user_data) {
         GSList *group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (togglebutton));
         // get the index of the radio button toggled
         // https://people.gnome.org/~desrt/glib-docs/glib-Singly-Linked-Lists.html#g-slist-index
-        g_print ("Index = %i\n", g_slist_index (group, togglebutton));
+        int radioIndex = g_slist_index (group, togglebutton);
+        int indexReal = elevarApotencia(3,cantidadCaracteristicas)-1 - radioIndex;
+        // set the label
+        gtk_label_set_text (labelGenotipoMadre, listaPadres[indexReal]);
+        gtk_label_set_text (labelFenotipoMadre, listaFenotipos[indexReal]);
     }
 }
 
@@ -97,13 +112,16 @@ void createGenotipos(int n) {
     int number = elevarApotencia(3,n);
     int numbre2 = elevarApotencia(2,n);
     GtkWidget *radio1, *radio2;
-    tableP = calloc(number,sizeof(GtkWidget**));
     // https://developer.gnome.org/gtk3/stable/GtkGrid.html
     //printf("%d\n", numberNodes);
     columnP = gtk_grid_new();
+
     gtk_container_add(GTK_CONTAINER(genotypeTable), columnP);
+
+    // memory for tableP
+    tableP = calloc(number,sizeof(GtkWidget*));
     for(int j = 0; j < number; j++) {
-        tableP[j] = calloc(numbre2, sizeof(GtkWidget*));
+        tableP[j] = calloc(numbre2, sizeof(GtkWidget));
     }
     // -------------------------------------------------------
     // father genotypes
@@ -140,11 +158,12 @@ void createGenotipos(int n) {
     GtkWidget     ***tableP2;
     // the grid
     GtkWidget 		*columnP2;
-    tableP2 = calloc(number,sizeof(GtkWidget**));
     columnP2 = gtk_grid_new();
     gtk_container_add(GTK_CONTAINER(genotypeTable1), columnP2);
+    // memory
+    tableP2 = calloc(number,sizeof(GtkWidget*));
     for(int j = 0; j < number; j++) {
-        tableP2[j] = calloc(numbre2, sizeof(GtkWidget*));
+        tableP2[j] = calloc(numbre2, sizeof(GtkWidget));
     }
 
     for(int j = 0; j < number; j++) 
@@ -179,12 +198,12 @@ void createDescendencia()
     int tableSize = 10;
 	// numberNodes = nodes;
 	//printf("%d\n", tableSize);
-	tableDes = calloc(tableSize,sizeof(GtkWidget**));
 	columnDes = gtk_grid_new ();
 
 
+	tableDes = calloc(tableSize,sizeof(GtkWidget*));
 	for(int j = 0; j < tableSize; j++) {
-		tableDes[j] = calloc(tableSize,sizeof(GtkWidget*));
+		tableDes[j] = calloc(tableSize,sizeof(GtkWidget));
 	}
 
 	gtk_container_add(GTK_CONTAINER(offspringTable), columnDes);
@@ -227,48 +246,49 @@ void createDescendencia()
 gboolean on_key_press_m(GtkWidget *widget, GdkEventKey *evento, gpointer user_data)
 {
 
-	if ((evento->keyval >= GDK_KEY_A) && (evento->keyval <= GDK_KEY_Z))
+	if ((evento->keyval >= GDK_KEY_A) && (evento->keyval <= GDK_KEY_Z)){
         return FALSE;	
-    if (evento->keyval == GDK_KEY_Right)
+    }
+    if (evento->keyval == GDK_KEY_Right){
         return FALSE;
-    
-    if (evento->keyval == GDK_KEY_Left)
+    }
+    if (evento->keyval == GDK_KEY_Left){
         return FALSE;
-    
-    if (evento->keyval == GDK_KEY_BackSpace) 
+    }
+    if (evento->keyval == GDK_KEY_BackSpace) {
         return FALSE;
-    
-    if (evento->keyval == GDK_KEY_space) 
+    }
+    if (evento->keyval == GDK_KEY_space) {
         return FALSE;
-    
-    else
-            return TRUE; 
+    }
+    else{
+        return TRUE; 
+    }
 }
 
 void createTableD0 (int nodes)
 {
-
 	numberNodes = nodes;
 	//printf("%d\n", numberNodes);
-	tableD0 = calloc(nodes,sizeof(GtkWidget**));
-	columnD0 = gtk_grid_new ();
+	columnD0 = gtk_grid_new();
 
-
+    // we get memory for the tableD0
+	tableD0 = calloc(nodes, sizeof(GtkEntry*));
 	for(int j = 0; j < nodes; j++) {
-		tableD0[j] = calloc(nodes,sizeof(GtkWidget*));
+		tableD0[j] = calloc(nodes,sizeof(GtkEntry));
 	}
 
 	gtk_container_add(GTK_CONTAINER(scrolledTable), columnD0);
-
 	for(int i = 0; i < nodes; i++)
 	{
 		for(int j = 0; j < 4; j++)
 		{	
+
 			tableD0[i][j] = gtk_entry_new();
 			gtk_entry_set_width_chars(GTK_ENTRY(tableD0[i][j]),8);
 			gtk_grid_attach (GTK_GRID(columnD0),tableD0[i][j], j, i, 1, 1);
 
-			if (j ==0 && i!=0){
+			if (i != 0 && j == 0){
 				//Caracteristicas dominantes -> table[1...n][2]
 				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"C");
 				g_signal_connect (G_OBJECT (tableD0[i][j]), "key_press_event", G_CALLBACK (on_key_press_m), NULL);
@@ -299,26 +319,22 @@ void createTableD0 (int nodes)
 				gtk_widget_set_sensitive(tableD0[i][j],FALSE);
 			}
 
-			if(i == 0 && j != 0){
-				//gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"0");
-				gtk_widget_set_sensitive(tableD0[i][j],FALSE);
-			}
-			if (j == 2 && i != 0){
+			// if(i == 0 && j != 0){
+			// 	//gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"0");
+			// 	gtk_widget_set_sensitive(tableD0[i][j],FALSE);
+			// }
+			if (i != 0 && j == 2){
 				//Caracteristicas recesivas -> table[1...n][2]
-
 				//gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"c");
 				gtk_widget_set_sensitive(tableD0[i][j],FALSE);
-
-
-
-				
 			}
-			
-			
+
 		}
 	}
 
+    printf("crash? %d\n", nodes);
 	gtk_widget_show_all(windowCreateData); 
+	// gtk_widget_show_now(windowCreateData);
 }
 
 void appendChar(int _val) {
@@ -396,6 +412,7 @@ void saveTemp()
 
 void destroy()
 {
+    // free(tableD0);
     gtk_widget_hide(windowSave);
 }
 
@@ -456,9 +473,8 @@ void createMatrix()
 {
 	gtk_widget_hide(windowSelectSize); 
 	inputNumberNodes = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(spinButtonNode));	
-	inputNumberNodes++; 
+	inputNumberNodes += 1; 
 	createTableD0(inputNumberNodes);
-	gtk_widget_show_now(windowCreateData);
 }
 
 void createHeader() {
@@ -558,15 +574,15 @@ void openGenotipos()
     // contenidoArchivo temp;
     // temp = leerArchivo("../aTemp.txt");
     // printf("Caracteristica: %s",temp.caracteristicas[0]);
-    int n = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(spinButtonNode)); 
-    printf("%d\n",n);
-    contenidoArchivo info = guardarInfo(n);
+    cantidadCaracteristicas = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(spinButtonNode)); 
+    printf("%d\n",cantidadCaracteristicas);
+    contenidoArchivo info = guardarInfo(cantidadCaracteristicas);
     // printf("Padres: %s|", info.caracteristicas[0]);
     // printf("Padres: %s|", info.caracteristicas[2]);
     // printf("Padres: %s|", info.caracteristicas[1]);
-    creaPadres(info.caracteristicas,n);
-    creaFenotipos(listaPadres,n,info.caracteristicas,info.feno_dominantes,info.feno_recesivos);
-    createGenotipos(n);
+    creaPadres(info.caracteristicas,cantidadCaracteristicas);
+    creaFenotipos(listaPadres,cantidadCaracteristicas,info.caracteristicas,info.feno_dominantes,info.feno_recesivos);
+    createGenotipos(cantidadCaracteristicas);
 }
 
 void openDescendencia(){
@@ -645,6 +661,13 @@ int main(int argc, char *argv[])
     // ----------------------
     chooseFileButton = GTK_WIDGET(gtk_builder_get_object(myBuilder, "btn_fileChooser"));
     filenameEntry = GTK_WIDGET(gtk_builder_get_object(myBuilder, "ent_fileName"));
+
+
+    // label para el padre genotipo
+	labelGenotipoPadre = GTK_WIDGET(gtk_builder_get_object(myBuilder, "lbl_genotipo_padre"));
+	labelGenotipoMadre = GTK_WIDGET(gtk_builder_get_object(myBuilder, "lbl_genotipo_madre"));
+	labelFenotipoPadre = GTK_WIDGET(gtk_builder_get_object(myBuilder, "lbl_fenotipo_padre"));
+	labelFenotipoMadre = GTK_WIDGET(gtk_builder_get_object(myBuilder, "lbl_fenotipo_madre"));
 
     gtk_builder_connect_signals(myBuilder, NULL);
     g_object_unref(myBuilder);
