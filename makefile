@@ -1,5 +1,5 @@
 # change application name here (executable output name)
-TARGET=IOProject
+TARGET=bin/IOProject
  
 # compiler
 CC=gcc
@@ -25,10 +25,10 @@ OBJS=    main.o
 all: $(OBJS)
 	$(LD) -o $(TARGET) $(OBJS) $(LDFLAGS)
 	$(CC) src/main.c -o $(TARGET) $(WARN) $(GTKLIB) -export-dynamic
-	$(CC) -o pending src/pending.c $(WARN) $(GTKLIB) -export-dynamic
-	$(CC) -o cruces src/cruces.c $(WARN) $(GTKLIB) -export-dynamic
+	$(CC) -o bin/pending src/pending.c $(WARN) $(GTKLIB) -export-dynamic
+	$(CC) -o bin/cruces src/cruces.c $(WARN) $(GTKLIB) -export-dynamic
 	# $(CC) -o ana src/utility/ana.c $(WARN) $(GTKLIB) -export-dynamic
-	$(CC) -o drawing src/drawing.c -lm $(WARN) $(GTKLIB) -export-dynamic
+	$(CC) -o bin/drawing src/drawing.c -lm $(WARN) $(GTKLIB) -export-dynamic
 
 main.o: src/main.c
 	$(CC) -c $(CCFLAGS) src/main.c $(GTKLIB) -o main.o
