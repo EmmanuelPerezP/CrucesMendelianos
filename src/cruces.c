@@ -1,10 +1,5 @@
 #include <gtk/gtk.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-
-#include "utility/utilidades.h"
-// #include "utility/aBiologia.c"
+#include "utility/aBiologia.c"
 
 #define gtk_spin_button_get_value_as_float gtk_spin_button_get_value
 #define MINAUX(a, b) ((a) < (b) ? a : b) // return min a , b
@@ -138,40 +133,42 @@ void motherCallback(GtkToggleButton *togglebutton, gpointer user_data) {
 }
 
 
-void createGenotipos() {
+void createGenotipos(int n) {
+    int number = elevarApotencia(3,n);
+    int numbre2 = elevarApotencia(2,n);
     GtkWidget *radio1, *radio2;
-    tableP = calloc(numberNodes,sizeof(GtkWidget**));
+    tableP = calloc(number,sizeof(GtkWidget**));
     // https://developer.gnome.org/gtk3/stable/GtkGrid.html
-    printf("%d\n", numberNodes);
+    //printf("%d\n", numberNodes);
     columnP = gtk_grid_new();
     gtk_container_add(GTK_CONTAINER(genotypeTable), columnP);
-    for(int j = 0; j < numberNodes; j++) {
-        tableP[j] = calloc(numberNodes, sizeof(GtkWidget*));
+    for(int j = 0; j < number; j++) {
+        tableP[j] = calloc(numbre2, sizeof(GtkWidget*));
     }
     // -------------------------------------------------------
     // father genotypes
-
-    for(int j = 0; j < numberNodes; j++) 
+    for(int j = 0; j < number; j++) 
     {
 
         if (j == 0){
             // Create the first entry
             // Create a radio button with a GtkEntry widget
-            radio1 = gtk_radio_button_new_with_label(NULL, "AABBaaB");
-            gtk_widget_set_tooltip_text(radio1, "TOOLTIP");
+            radio1 = gtk_radio_button_new_with_label(NULL, listaPadres[j]);
+            gtk_widget_set_tooltip_text(radio1, listaFenotipos[j]);
 
             g_signal_connect (G_OBJECT (radio1), "clicked", G_CALLBACK (fatherCallback), NULL); 
             gtk_grid_attach (GTK_GRID(columnP), radio1, 0, 0, 1, 1);
         }
         if (j != 0){
             // Create a radio button with a label
-            radio2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(radio1), "BABbbAA");
-            gtk_widget_set_tooltip_text(radio2, "TOOLTIP");
+            radio2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(radio1), listaPadres[j]);
+            gtk_widget_set_tooltip_text(radio2, listaFenotipos[j]);
             g_signal_connect (G_OBJECT (radio2), "clicked", G_CALLBACK (fatherCallback), NULL); 
             tableP[j][0] = radio2;
             gtk_grid_attach (GTK_GRID(columnP), tableP[j][0], 0, j, 1, 1);
         }
     }
+
 
     // -------------------------------------------------------
     // mother genotypes
@@ -183,32 +180,34 @@ void createGenotipos() {
     GtkWidget     ***tableP2;
     // the grid
     GtkWidget 		*columnP2;
+    tableP2 = calloc(number,sizeof(GtkWidget**));
     columnP2 = gtk_grid_new();
     gtk_container_add(GTK_CONTAINER(genotypeTable1), columnP2);
-    for(int j = 0; j < numberNodes; j++) {
-        tableP2[j] = calloc(numberNodes, sizeof(GtkWidget*));
+    for(int j = 0; j < number; j++) {
+        tableP2[j] = calloc(numbre2, sizeof(GtkWidget*));
     }
 
-    for(int j = 0; j < numberNodes; j++) 
+    for(int j = 0; j < number; j++) 
     {
 
         if (j == 0){
             // Create the first entry
             // Create a radio button with a GtkEntry widget
-            radioM1 = gtk_radio_button_new_with_label(NULL, "DDBBaaB");
+            radioM1 = gtk_radio_button_new_with_label(NULL, listaPadres[j]);
+            gtk_widget_set_tooltip_text(radioM1, listaFenotipos[j]);
             gtk_grid_attach (GTK_GRID(columnP2), radioM1, 0, 0, 1, 1);
             g_signal_connect (G_OBJECT (radioM1), "clicked", G_CALLBACK (motherCallback), NULL); 
         }
         if (j != 0){
             // Create a radio button with a label
             //radioM2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(radioM1), "CCCbbAA");
-            radioM2 = gtk_radio_button_new_with_label(gtk_radio_button_get_group(radioM1), "CCCbbAA");
+            radioM2 = gtk_radio_button_new_with_label(gtk_radio_button_get_group(radioM1), listaPadres[j]);
+            gtk_widget_set_tooltip_text(radioM2, listaFenotipos[j]);
             g_signal_connect (G_OBJECT (radioM2), "clicked", G_CALLBACK (motherCallback), NULL); 
             tableP2[j][0] = radioM2;
             gtk_grid_attach (GTK_GRID(columnP2), tableP2[j][0], 0, j, 1, 1);
         }
     }
-
     gtk_widget_show_all(windowGenotipos);
 }
 
@@ -219,7 +218,7 @@ void createDescendencia()
     GtkWidget     ***tableDes;
     int tableSize = 10;
 	// numberNodes = nodes;
-	printf("%d\n", tableSize);
+	//printf("%d\n", tableSize);
 	tableDes = calloc(tableSize,sizeof(GtkWidget**));
 	columnDes = gtk_grid_new ();
 
@@ -259,7 +258,7 @@ void createTableD0 (int nodes)
 {
 
 	numberNodes = nodes;
-	printf("%d\n", numberNodes);
+	//printf("%d\n", numberNodes);
 	tableD0 = calloc(nodes,sizeof(GtkWidget**));
 	columnD0 = gtk_grid_new ();
 
@@ -323,70 +322,6 @@ void createTableD0 (int nodes)
 	}
 
 	gtk_widget_show_all(windowCreateData); 
-}
-
-void guardarInfo(){
-
-	// Para guardar los datos ingresados por el usuario
-	char caracteristicas[numberNodes][20];
-	char feno_dominantes[numberNodes][20];
-	char feno_recesivos[numberNodes][20];
-
-	printf("%d\n", numberNodes);
-
-	for(int i = 0; i < numberNodes; i++)
-	{
-		for(int j = 0; j < 4; j++)
-		{
-			//Caracteristicas dominantes -> table[1...n][2]
-			if (j == 0 && i!=0)
-			{
-				strcpy(caracteristicas[i-1], gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
-				//caracteristicas[i] = gtk_entry_get_text(GTK_ENTRY(tableD0[i][j]));
-			}
-			
-			// Descripción caracteristicas dominantes -> table[1...n][1]
-			if(j == 1 && i != 0)
-			{
-				strcpy(feno_dominantes[i-1], gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
-				//feno_dominantes[i] = gtk_entry_get_text(GTK_ENTRY(tableD0[i][j]));
-			}
-			
-			//Caracteristicas recesivas -> table[1...n][2]
-			if (j == 2 && i != 0)
-			{
-				//gtk_entry_get_text(GTK_ENTRY(tableD0[i][j]));	
-			}
-			
-			// Descripción caracteristicas recesivas -> table[1...n][3]
-			if (j == 3 && i != 0) 
-			{
-				strcpy(feno_recesivos[i-1], gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
-				//feno_recesivos[i] = gtk_entry_get_text(GTK_ENTRY(tableD0[i][j]));
-			
-			}
-
-
-		}
-	}
-
-	//Imprimir datos para verificar 
-   int loop;
-   printf("Caracteristicas: \n");
-   for(loop = 0; loop < numberNodes; loop++)
-      printf("%s\n", caracteristicas[loop]);
-
-   int loop1;
-   printf("Fenotipos Dominantes: \n");
-   for(loop1 = 0; loop1 < numberNodes; loop1++)
-      printf("%s\n", feno_dominantes[loop1]);
-
-   int loop2;
-   printf("Fenotipos Recesivos: \n");
-   for(loop2 = 0; loop2 < numberNodes; loop2++)
-      printf("%s\n", feno_recesivos[loop2]);
-
-
 }
 
 void setTableD(int MatrixD[][numberNodes-1]){
@@ -551,27 +486,6 @@ int getNext() {
     return 0;
 }
 
-int loadData(char *filename)
-{
-    infoFile = fopen(filename, "r");
-    int ch;
-    if(infoFile != NULL)
-    {
-        while(feof(infoFile) == 0) {  
-            ch = fgetc(infoFile);
-            if (ch == '\n'){
-                break;
-            }
-            if (ch ==';'){
-                numberNodes ++;
-            }
-        }
-
-        fclose(infoFile);
-        return 1;
-    }
-    return 0;
-}
 
 void createTablesFromFile(){
     int matrizAux[numberNodes-1][numberNodes-1];
@@ -630,7 +544,7 @@ void createTablesFromFile(){
         accion = getNext();
     }
 
-    createGenotipos();
+    //createGenotipos(n);
     setTableFile(matrizAux);
 }
 void createInfoFile(char *filename) {
@@ -682,22 +596,35 @@ void destroyGetPath()
     gtk_widget_hide(windowFinal);
 }
 
-int loadFile()
+// ---------------------------
+// Carga archivos de txt
+
+int loadData(string nombreArchivo)
 {
-    filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooseFileButton));
-    int flag = loadData(filename);
-    return flag;
+    contenidoArchivo archivoContenido;
+    archivoContenido = leerArchivo(nombreArchivo);
+    printf("%s\n",archivoContenido.caracteristicas[0]);
+    printf("%s\n",archivoContenido.caracteristicas[1]);
+
 }
+
+void loadFile()
+{
+    char *nombreArchivo;
+    nombreArchivo = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooseFileButton));
+    printf("%s\n", nombreArchivo);
+    loadData(nombreArchivo);
+    return 0;
+}
+// ---------------------------
 
 void createMatrixFile()
 {
-    if(loadFile() == 1)
-    {
-        gtk_widget_hide(windowSelectFile);
-        loadFileFlag = 1;
-        createTablesFromFile();
-        gtk_widget_show_all(windowCreateData);
-    } 
+    loadFile();
+    //gtk_widget_hide(windowSelectFile);
+    //loadFileFlag = 1;
+    //createTablesFromFile();
+    //gtk_widget_show_all(windowCreateData);
 }
 
 void printMatrix(int matrix[numberNodes-1][numberNodes-1], int totalNode)
@@ -952,14 +879,82 @@ void closeError()
 //------------------------------------------------------------------------------------------------------------------------------------
 // Funciones para cruces mendelianos
 
+contenidoArchivo guardarInfo(int n){
+
+    // Para guardar los datos ingresados por el usuario
+    contenidoArchivo contenido;
+
+    printf("%d\n", n);
+
+    for(int i = 0; i <= n; i++)
+    {
+        for(int j = 0; j < 4; j++)
+        {
+            //Caracteristicas dominantes -> table[1...n][2]
+            if (j == 0 && i!=0)
+            {
+                strcpy(contenido.caracteristicas[i-1], gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
+                strcpy(contenido.caracteristicas[i],gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
+            }
+            
+            // Descripción caracteristicas dominantes -> table[1...n][1]
+            if(j == 1 && i != 0)
+            {
+                strcpy(contenido.feno_dominantes[i-1], gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
+                strcpy(contenido.feno_dominantes[i],gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
+            }
+            
+            //Caracteristicas recesivas -> table[1...n][2]
+            if (j == 2 && i != 0)
+            {
+                //gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])); 
+            }
+            
+            // Descripción caracteristicas recesivas -> table[1...n][3]
+            if (j == 3 && i != 0) 
+            {
+                strcpy(contenido.feno_recesivos[i-1], gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
+                strcpy(contenido.feno_recesivos[i],gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
+            
+            }
+        }
+    }
+
+    //Imprimir datos para verificar 
+   int loop;
+   printf("Caracteristicas: \n");
+   for(loop = 0; loop < n; loop++)
+      printf("%s\n", contenido.caracteristicas[loop]);
+
+   int loop1;
+   printf("Fenotipos Dominantes: \n");
+   for(loop1 = 0; loop1 < n; loop1++)
+      printf("%s\n", contenido.feno_dominantes[loop1]);
+
+   int loop2;
+   printf("Fenotipos Recesivos: \n");
+   for(loop2 = 0; loop2 < n; loop2++)
+      printf("%s\n", contenido.feno_recesivos[loop2]);
+
+  return contenido;
+
+}
+
 void openGenotipos()
 {
     // padresMain();
     // contenidoArchivo temp;
     // temp = leerArchivo("../aTemp.txt");
     // printf("Caracteristica: %s",temp.caracteristicas[0]);
-    createGenotipos();
-    return;
+    int n = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(spinButtonNode)); 
+    printf("%d\n",n);
+    contenidoArchivo info = guardarInfo(n);
+    printf("Padres: %s|", info.caracteristicas[0]);
+    printf("Padres: %s|", info.caracteristicas[2]);
+    printf("Padres: %s|", info.caracteristicas[1]);
+    creaPadres(info.caracteristicas,n);
+    creaFenotipos(listaPadres,n,info.caracteristicas,info.feno_dominantes,info.feno_recesivos);
+    createGenotipos(n);
 }
 
 void openDescendencia(){
@@ -977,25 +972,30 @@ void openDescendencia(){
 gboolean on_key_press (GtkWidget *widget, GdkEventKey *evento, gpointer user_data)
 //Permite solo numeros en entradas, restringiendo los keypress
 {
-    if ((evento->keyval >= GDK_KEY_A) && (evento->keyval <= GDK_KEY_Z))
+    if ((evento->keyval >= GDK_KEY_A) && (evento->keyval <= GDK_KEY_Z)){
         return FALSE;	
+    }
 
-    if ((evento->keyval >= GDK_KEY_a) && (evento->keyval <= GDK_KEY_z))
+    if ((evento->keyval >= GDK_KEY_a) && (evento->keyval <= GDK_KEY_z)){
         return FALSE;
-
-    if (evento->keyval == GDK_KEY_Right)
+    }
+    if (evento->keyval == GDK_KEY_Right){
         return FALSE;
+    }
     
-    if (evento->keyval == GDK_KEY_Left)
+    if (evento->keyval == GDK_KEY_Left){
         return FALSE;
+    }
     
-    if (evento->keyval == GDK_KEY_BackSpace) 
+    if (evento->keyval == GDK_KEY_BackSpace) {
         return FALSE;
-    
-    if (evento->keyval == GDK_KEY_space) 
+    }
+    if (evento->keyval == GDK_KEY_space) {
         return FALSE;
-    else
-            return TRUE; 
+    }
+    else{
+        return TRUE; 
+    }
 }
 
 int main(int argc, char *argv[])
@@ -1016,8 +1016,6 @@ int main(int argc, char *argv[])
     windowFinal  = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_floyd_results"));
 
     g_signal_connect (G_OBJECT (windowCreateData), "key_press_event", G_CALLBACK (on_key_press), NULL);   
-    window_ingresar_info = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_ingresar_info"));  
-
     g_signal_connect (G_OBJECT (window_ingresar_info), "key_press_event", G_CALLBACK (on_key_press), NULL); 
     windowSelectSize = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_floyd_selectSize"));
     windowSelectFile = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_floyd_selectFile"));
@@ -1025,7 +1023,7 @@ int main(int argc, char *argv[])
     windowSave = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_floyd_saved"));
     spinButtonNode = GTK_WIDGET(gtk_builder_get_object(myBuilder, "ent_size"));
 
-    gtk_spin_button_set_range (GTK_SPIN_BUTTON(spinButtonNode),1,27);
+    gtk_spin_button_set_range (GTK_SPIN_BUTTON(spinButtonNode),1,6);
     gtk_spin_button_set_increments (GTK_SPIN_BUTTON(spinButtonNode),1,3);
     label_table_DNumber = GTK_WIDGET(gtk_builder_get_object(myBuilder, "lbl_table"));
     scrolledTable = GTK_WIDGET(gtk_builder_get_object(myBuilder, "scrolled_table"));
