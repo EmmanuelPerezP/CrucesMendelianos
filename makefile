@@ -8,7 +8,7 @@ DEBUG=-g
 # optimisation
 OPT=-O0
 # warnings
-WARN=-Wall
+WARN=
  
 PTHREAD=-pthread
  

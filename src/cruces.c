@@ -22,6 +22,9 @@ GtkWidget     ***tableD0;
 GtkWidget 		*scrolledTable;
 GtkGrid 		*columnD0;
 
+GtkWidget  	  *windowInputError;
+GtkWidget     *windowRepeatError;
+
 GtkWidget     ***tableP;
 GtkWidget 		*columnP;
 GtkWidget 		*genotypeTable;
@@ -334,7 +337,7 @@ void createTableD0 (int nodes)
 			// }
 			if (i != 0 && j == 2){
 				//Caracteristicas recesivas -> table[1...n][2]
-				//gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"c");
+				gtk_entry_set_text (GTK_ENTRY(tableD0[i][j]),"-");
 				gtk_widget_set_sensitive(tableD0[i][j],FALSE);
 			}
 
@@ -361,6 +364,58 @@ void appendChar(int _val) {
 void cleanBuffer(){
     memset(bufferForFile,'\0',strlen(bufferForFile));
 }
+
+//Funciones para validar que no hayan casillas vacias ni casillas repetidas - Falta terminar
+
+int nhay_vacia(){
+/*Verificar que hay posiciones vacias*/
+	for (int row=0; row<numberNodes; row++){
+   	 	for (int colum=0; colum<4; colum++){
+        
+            if (*gtk_entry_get_text(GTK_ENTRY(tableD0[row][colum]))=='\0')
+            {
+               return 0;
+            }
+        }
+    }    
+    return 1;
+} 
+
+
+int repeated_in_colum(const gchar* n)
+/*Determina si n se repite en la columna*/
+{
+int count = 0;
+const gchar* num = NULL;
+    for (int row=1; row<numberNodes; row++){
+        num = gtk_entry_get_text(GTK_ENTRY(tableD0[row][0]));
+        
+        if (*num==*n){
+           count = count + 1;
+           //printf("Repetidos: %s == %s \n",num,n);
+           if (count>1){
+              return 1;
+           }
+        }
+    }
+    return 0;
+}
+
+int valid_caract()
+//Verifica si la columna es valida
+{
+    for (int cont=1; cont<numberNodes; cont++){
+      if (repeated_in_colum(gtk_entry_get_text(GTK_ENTRY(tableD0[cont][0])))){
+          return 0;
+      }
+    }
+    return 1;
+}
+
+//-------------------------------------------------------------------------
+
+
+
 
 int getNext() {
     cleanBuffer();
@@ -511,7 +566,15 @@ void drawGraph()
     system("./drawing &");
 }
 
+void closeInputError()
+{
+	gtk_widget_hide(windowInputError); 	
+}
 
+void closeRepeatError()
+{
+	gtk_widget_hide(windowRepeatError); 	
+}
 
 //------------------------------------------------------------------------------------------------------------------------------------
 // Funciones para cruces mendelianos
@@ -523,55 +586,94 @@ contenidoArchivo guardarInfo(int n){
 
     printf("%d\n", n);
 
-    for(int i = 0; i <= n; i++)
-    {
-        for(int j = 0; j < 4; j++)
-        {
-            //Caracteristicas dominantes -> table[1...n][2]
-            if (j == 0 && i!=0)
-            {
-                strcpy(contenido.caracteristicas[i-1], gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
-                strcpy(contenido.caracteristicas[i],gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
-            }
-            
-            // Descripción caracteristicas dominantes -> table[1...n][1]
-            if(j == 1 && i != 0)
-            {
-                strcpy(contenido.feno_dominantes[i-1], gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
-                strcpy(contenido.feno_dominantes[i],gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
-            }
-            
-            //Caracteristicas recesivas -> table[1...n][2]
-            if (j == 2 && i != 0)
-            {
-                //gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])); 
-            }
-            
-            // Descripción caracteristicas recesivas -> table[1...n][3]
-            if (j == 3 && i != 0) 
-            {
-                strcpy(contenido.feno_recesivos[i-1], gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
-                strcpy(contenido.feno_recesivos[i],gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
-            
-            }
-        }
-    }
+    if(nhay_vacia())
+	{
+		printf("Ya no hay casillas vacias.\n");
 
-    //Imprimir datos para verificar 
-   int loop;
-   printf("Caracteristicas: \n");
-   for(loop = 0; loop < n; loop++)
-      printf("%s\n", contenido.caracteristicas[loop]);
+		if(valid_caract())
+		{
+			printf("Ya no hay casillas repetidas.\n");
+            for(int i = 0; i <= n; i++)
+            {
+                for(int j = 0; j < 4; j++)
+                {
+                    //Caracteristicas dominantes -> table[1...n][2]
+                    if (j == 0 && i!=0)
+                    {
+                        strcpy(contenido.caracteristicas[i-1], gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
+                        strcpy(contenido.caracteristicas[i],gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
+                    }
+                    
+                    // Descripción caracteristicas dominantes -> table[1...n][1]
+                    if(j == 1 && i != 0)
+                    {
+                        strcpy(contenido.feno_dominantes[i-1], gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
+                        strcpy(contenido.feno_dominantes[i],gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
+                    }
+                    
+                    //Caracteristicas recesivas -> table[1...n][2]
+                    if (j == 2 && i != 0)
+                    {
+                        //gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])); 
+                    }
+                    
+                    // Descripción caracteristicas recesivas -> table[1...n][3]
+                    if (j == 3 && i != 0) 
+                    {
+                        strcpy(contenido.feno_recesivos[i-1], gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
+                        strcpy(contenido.feno_recesivos[i],gtk_entry_get_text(GTK_ENTRY(tableD0[i][j])));
+                    
+                    }
+                }
+            }
 
-   int loop1;
-   printf("Fenotipos Dominantes: \n");
-   for(loop1 = 0; loop1 < n; loop1++)
-      printf("%s\n", contenido.feno_dominantes[loop1]);
+			int loop;
+   			printf("Caracteristicas: \n");
+   			for(loop = 0; loop < numberNodes; loop++)
+  			{
+   				gchar *c;	
+   				int x = 0;
 
-   int loop2;
-   printf("Fenotipos Recesivos: \n");
-   for(loop2 = 0; loop2 < n; loop2++)
-      printf("%s\n", contenido.feno_recesivos[loop2]);
+      			// printf("%s\n", caracteristicas[loop]);
+
+      			c = gtk_entry_get_text(GTK_ENTRY(tableD0[loop][0]));
+      			x = strlen(c);
+
+      			c = g_utf8_strdown(c,x); 
+      			printf("Minuscula: %s\n", c);
+
+      			gtk_entry_set_text(GTK_ENTRY(tableD0[loop][2]), c);
+
+   			}
+		}
+		else
+		{
+			printf("Error: hay caracteristicas repetidas.\n");
+			gtk_widget_show_all(windowRepeatError); 
+		}
+	}
+	else
+	{
+		printf("Error: hay casillas vacias.\n");
+		gtk_widget_show_all(windowInputError); 
+	}
+			
+
+//     //Imprimir datos para verificar 
+//    int loop;
+//    printf("Caracteristicas: \n");
+//    for(loop = 0; loop < n; loop++)
+//       printf("%s\n", contenido.caracteristicas[loop]);
+
+//    int loop1;
+//    printf("Fenotipos Dominantes: \n");
+//    for(loop1 = 0; loop1 < n; loop1++)
+//       printf("%s\n", contenido.feno_dominantes[loop1]);
+
+//    int loop2;
+//    printf("Fenotipos Recesivos: \n");
+//    for(loop2 = 0; loop2 < n; loop2++)
+//       printf("%s\n", contenido.feno_recesivos[loop2]);
 
   return contenido;
 
@@ -654,6 +756,10 @@ int main(int argc, char *argv[])
     windowInitial = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_floyd_start"));
     windowCreateData = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_floyd"));
     g_signal_connect (G_OBJECT (windowCreateData), "key_press_event", G_CALLBACK (on_key_press), NULL);   
+    windowInputError = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_input_error"));
+    windowRepeatError = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_repeat_error"));
+
+
     // ---------------------
     // windows for biologia
     windowGenotipos = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_genotipos"));
@@ -662,6 +768,7 @@ int main(int argc, char *argv[])
 
     windowSelectSize = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_floyd_selectSize"));
     windowSelectFile = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_floyd_selectFile"));
+
     windowSave = GTK_WIDGET(gtk_builder_get_object(myBuilder, "window_floyd_saved"));
     spinButtonNode = GTK_WIDGET(gtk_builder_get_object(myBuilder, "ent_size"));
 
